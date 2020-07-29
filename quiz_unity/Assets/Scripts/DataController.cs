@@ -1,16 +1,27 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using System.IO;
+using Newtonsoft.Json;
 
 public class DataController : MonoBehaviour 
 {
 	private RoundData[] allRoundData;
 	private PlayerProgress playerProgress;
 	private string gameDataFileName = "data.json";
-	
+
+	private Question[] questionsFromQuiz;
+
+	// Só para testes.
+	public string path;
+	public string filenameJSON = "ExampleJSON.json";
+
+
 	void Start ()  
 	{
+		retrieveQuiz();
+
 		DontDestroyOnLoad (gameObject);
 		LoadGameData();
 		LoadPlayerProgress();
@@ -68,4 +79,31 @@ public class DataController : MonoBehaviour
 			Debug.LogError("Cannot load game data!");
 		}
 	}
+
+	// Não veio como o projeto:
+
+	private void retrieveQuiz()
+	{
+		List<Question> questionsList;
+		questionsList = getContentFromFile();
+		questionsFromQuiz = questionsList.ToArray();
+	}
+
+	private List<Question> getContentFromFile()
+	{
+		string json = readFromJson();
+		Debug.Log(json);
+		return JsonConvert.DeserializeObject<List<Question>>(json);
+	}
+
+	private string readFromJson()
+	{
+		return System.IO.File.ReadAllText(path + filenameJSON);
+	}
+
+	public Question[] GetQuestions()
+	{
+		return questionsFromQuiz;
+	}
+	// OBS: Requisição de internet deve ficar em um objeto (NetHandler) persistente aparte
 }

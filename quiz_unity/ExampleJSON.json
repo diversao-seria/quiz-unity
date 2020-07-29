@@ -1,0 +1,14 @@
+[
+	{"id":1,
+	 "text":"Descrição da pergunta 1",
+	 "alternativesNumber":5,
+	 "hideFlags":0},
+	{"id":2,
+	 "text":"Descrição da pergunta 2",
+	 "alternativesNumber":5,
+	 "hideFlags":0},
+	{"id":3,
+	 "text":"Descrição da pergunta 3",
+	 "alternativesNumber":5,
+	 "hideFlags":0}
+]
