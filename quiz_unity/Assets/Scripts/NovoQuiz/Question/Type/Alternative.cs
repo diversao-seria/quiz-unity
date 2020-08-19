@@ -1,23 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Newtonsoft.Json;
 
-public class Alternative : Question
+
+public class Alternative
 {
-    private QuestionType type;
+    [JsonProperty("id")]
+    public int Id { get; set; }
 
-    // Property
+    [JsonProperty("content")]
+    public string Content { get; set; }
 
-    public QuestionType Type { get; set; }
+    [JsonProperty("QuestionType")]
+    public int QuestionType { get; set; }
 
-    public Alternative(int ID, string text, int alternativesNumber)
-    {
-        this.ID = ID;
-        this.Text = text;
-        this.AlternativesNumber = alternativesNumber;
-        this.Type = QuestionType.Text;
-    }
-
-
-
+    [JsonProperty("isCorrect")]
+    public bool IsCorrect { get; set; }
 }

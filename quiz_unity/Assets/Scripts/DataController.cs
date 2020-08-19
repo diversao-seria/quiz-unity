@@ -4,27 +4,29 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using System.IO;
 using Newtonsoft.Json;
+using System;
 
 public class DataController : MonoBehaviour 
 {
 	private RoundData[] allRoundData;
 	private PlayerProgress playerProgress;
 	private string gameDataFileName = "data.json";
-
-	private Question[] questionsFromQuiz;
+	private Quiz currentQuiz;
 
 	// Só para testes.
 	public string path;
 	public string filenameJSON = "ExampleJSON.json";
 
-
 	void Start ()  
 	{
-		retrieveQuiz();
 
 		DontDestroyOnLoad (gameObject);
+
 		LoadGameData();
 		LoadPlayerProgress();
+
+		QuestionData questions = retrieveQuestions();
+		currentQuiz = new Quiz(questions, "123456");
 		
 		SceneManager.LoadScene("MenuScreen");
 	}
@@ -82,18 +84,29 @@ public class DataController : MonoBehaviour
 
 	// Não veio como o projeto:
 
-	private void retrieveQuiz()
+	public Quiz RetrieveQuiz()
 	{
-		List<Question> questionsList;
-		questionsList = getContentFromFile();
-		questionsFromQuiz = questionsList.ToArray();
+		return currentQuiz;
 	}
 
-	private List<Question> getContentFromFile()
+	private QuestionData IntializationOfAllObjects()
+    {
+		QuestionData questionData = new QuestionData();
+		return questionData;
+    }
+
+	private QuestionData retrieveQuestions()
+    {
+		QuestionData questionsData = IntializationOfAllObjects();
+		questionsData = getContentFromFile();
+		return questionsData;
+	}
+
+	private QuestionData getContentFromFile()
 	{
 		string json = readFromJson();
 		Debug.Log(json);
-		return JsonConvert.DeserializeObject<List<Question>>(json);
+		return JsonConvert.DeserializeObject<QuestionData>(json);
 	}
 
 	private string readFromJson()
@@ -101,9 +114,5 @@ public class DataController : MonoBehaviour
 		return System.IO.File.ReadAllText(path + filenameJSON);
 	}
 
-	public Question[] GetQuestions()
-	{
-		return questionsFromQuiz;
-	}
-	// OBS: Requisição de internet deve ficar em um objeto (NetHandler) persistente aparte
+	// OBS: Requisição de internet deve ficar em um objeto a parte, ver NetController.
 }

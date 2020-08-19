@@ -5,25 +5,19 @@ using UnityEngine;
 public class Quiz
 {
     private string code;
-    private Question[] questions;
+    private QuestionData questionData;
 
     public string Code { get; set; }
 
-    public Quiz(Question[] questions)
+    public Quiz(QuestionData questionData, string code)
     {
-        if (questions != null)
-        {
-            this.questions = questions;
-        }
-        else 
-        {
-            this.questions = null;
-        }
+        this.code = code;
+        this.questionData = questionData;
        // Read from processed JSON.
     }
 
-    public Question[] GetQuestions()
+    public QuestionData GetQuestionData()
     {
-        return questions;
+        return questionData;
     }
 }

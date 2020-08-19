@@ -1,6 +1,8 @@
-﻿[System.Serializable]
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
+
 public class QuestionData
 {
-	public string questionText;
-	public AnswerData[] answers;
+    [JsonProperty("questions")]
+    public List<Question> Questions { get; set; }
 }

@@ -1,17 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Newtonsoft.Json;
 
 public class Question
 {
-    private int id;
-    private string text;
-    private int alternativesNumber;
-
-    // Property
-
-    public int ID { get; set; } // ID único relacionado  questão?
+    [JsonProperty("text")]
     public string Text { get; set; }
-    public int AlternativesNumber {  get; set;  }
+
+    [JsonProperty("alternativesNumber")]
+    public int AlternativesNumber { get; set; }
+
+    [JsonProperty("alternatives")]
+    public List<Alternative> Alternatives { get; set; }
 
 }
