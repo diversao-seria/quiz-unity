@@ -1,11 +1,17 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Runtime.CompilerServices;
+using UnityEditorInternal;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class MenuScreenController : MonoBehaviour
 {
     public Button m_classic, m_survival, m_competition;
+    public GameObject TransitionCanvas;
+    private Animator animator;
+    private float transitionDelay = 1f;
 
-    void Start()
+    void Awake()
     {
         m_classic.onClick.AddListener(ClassicBehaviour);
         m_survival.onClick.AddListener(SurvivalBehaviour);
@@ -14,7 +20,15 @@ public class MenuScreenController : MonoBehaviour
 
     void ClassicBehaviour()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Game");
+        StartCoroutine(TransitionAnimation("Game"));
+    }
+
+    IEnumerator TransitionAnimation(string scene)
+    {
+        animator = TransitionCanvas.GetComponent<Animator>();
+        animator.SetTrigger("TransitionTrigger");
+        yield return new WaitForSeconds(transitionDelay);
+        UnityEngine.SceneManagement.SceneManager.LoadScene(scene);
     }
 
     void SurvivalBehaviour()

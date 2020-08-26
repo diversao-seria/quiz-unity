@@ -23,7 +23,7 @@ public class Clock : IClock
 
     public void Reset()
     {
-        Time = 0;
+        Time = 0.0f;
     }
 
     public void NewCountdown(float initialTimeInSeconds)
