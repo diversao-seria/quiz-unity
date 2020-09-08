@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using UnityEditorInternal;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class MenuScreenController : MonoBehaviour
@@ -10,12 +11,25 @@ public class MenuScreenController : MonoBehaviour
     public GameObject TransitionCanvas;
     private Animator animator;
     private float transitionDelay = 1f;
+    public EventSystem eventSystem;
+
 
     void Awake()
     {
         m_classic.onClick.AddListener(ClassicBehaviour);
         m_survival.onClick.AddListener(SurvivalBehaviour);
         m_competition.onClick.AddListener(CompetitionBehaviour);
+    }
+
+    void Update()
+    {
+        if (Input.touchCount > 0)
+        {
+            if (EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
+            {
+                Debug.Log("HUE!");
+            }
+        }
     }
 
     void ClassicBehaviour()
