@@ -23,13 +23,7 @@ public class MenuScreenController : MonoBehaviour
 
     void Update()
     {
-        if (Input.touchCount > 0)
-        {
-            if (EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
-            {
-                Debug.Log("HUE!");
-            }
-        }
+
     }
 
     void ClassicBehaviour()

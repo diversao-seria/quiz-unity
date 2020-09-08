@@ -16,20 +16,18 @@ public class EventManager : MonoBehaviour
 
     private Clock holdTouchClock;
     private bool wasTouched;
-    private bool answerRegistred;
     public float answerConfirmation = 3.0f;   // in seconds
     public Slider progressSlider;
 
     public void Awake()
     {
         wasTouched = false;
-        answerRegistred = false;
         holdTouchClock = new Clock(0);
     }
 
     public void Update()
     {
-        if(wasTouched && !answerRegistred)
+        if(wasTouched)
         {
 
             holdTouchClock.IncreaseTime(Time.deltaTime);
@@ -37,17 +35,17 @@ public class EventManager : MonoBehaviour
 
             if(holdTouchClock.Time >= answerConfirmation)
             {
-                // ans
-                UnityEngine.SceneManagement.SceneManager.LoadScene(1);
+                resetSlider();
+                holdTouchClock.Reset();
+                gameObject.GetComponent<AnswerButton>().HandleClick();
             }
             else
             {
                 // TO DO-> CONSIDERAR POSIÇÂO DO TOUCH COM RELAÇÂO Ao tamanho do butão.
+                // BUG: Aperte o botão e algum lugar da tela ao mesmo tempo. Solte apenas o botao
                 if (Input.touchCount <= 0)
                 {
-                    wasTouched = false;
-                    progressSlider.value = 0;
-                    progressSlider.gameObject.SetActive(false);
+                    resetSlider();
                     holdTouchClock.Reset();
                 }
             }
@@ -58,5 +56,12 @@ public class EventManager : MonoBehaviour
     {
         wasTouched = true;
         progressSlider.gameObject.SetActive(true);
+    }
+
+    private void resetSlider()
+    {
+        wasTouched = false;
+        progressSlider.value = 0;
+        progressSlider.gameObject.SetActive(false);
     }
 }

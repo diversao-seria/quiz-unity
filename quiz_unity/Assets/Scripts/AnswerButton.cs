@@ -26,6 +26,5 @@ public class AnswerButton : MonoBehaviour
 	public void HandleClick()
 	{
 		gameController.AnswerButtonClicked(alternative.IsCorrect);
-		color = Color.Lerp(color, Color.green, Mathf.PingPong(Time.time, 1));
 	}
 }
