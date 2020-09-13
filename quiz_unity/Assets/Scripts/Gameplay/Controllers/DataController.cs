@@ -24,9 +24,10 @@ public class DataController : MonoBehaviour
 
 		LoadGameData();
 		LoadPlayerProgress();
-
+		
 		QuestionData questions = retrieveQuestions();
 		currentQuiz = new Quiz(questions, "123456");
+		
 		
 		SceneManager.LoadScene("MenuScreen");
 	}
@@ -82,7 +83,7 @@ public class DataController : MonoBehaviour
 		}
 	}
 
-	// Não veio como o projeto:
+	// Não veio com o projeto:
 
 	public Quiz RetrieveQuiz()
 	{
@@ -114,5 +115,13 @@ public class DataController : MonoBehaviour
 		return System.IO.File.ReadAllText(path + filenameJSON);
 	}
 
-	// OBS: Requisição de internet deve ficar em um objeto a parte, ver NetController.
+	public void TrackQuestionsAnswers(int n)
+    {
+		playerProgress.questionAnswers = new QuestionAnswer(n);
+    }
+
+	public QuestionAnswer GetQuestionAnswers()
+    {
+		return playerProgress.GetQuestionAnswers();
+    }
 }

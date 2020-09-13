@@ -42,7 +42,6 @@ public class EventManager : MonoBehaviour
             else
             {
                 // TO DO-> CONSIDERAR POSIÇÂO DO TOUCH COM RELAÇÂO Ao tamanho do butão.
-                // BUG: Aperte o botão e algum lugar da tela ao mesmo tempo. Solte apenas o botao
                 if (Input.touchCount <= 0)
                 {
                     resetSlider();
@@ -63,5 +62,10 @@ public class EventManager : MonoBehaviour
         wasTouched = false;
         progressSlider.value = 0;
         progressSlider.gameObject.SetActive(false);
+    }
+
+    public bool TouchLastStatus()
+    {
+        return wasTouched;
     }
 }

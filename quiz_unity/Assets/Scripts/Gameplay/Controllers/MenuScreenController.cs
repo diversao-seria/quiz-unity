@@ -8,6 +8,12 @@ using UnityEngine.UI;
 public class MenuScreenController : MonoBehaviour
 {
     public Button m_classic, m_survival, m_competition;
+
+    public Image m_profile, m_exit;
+
+    public Image m_exitPopup;
+
+
     public GameObject TransitionCanvas;
     private Animator animator;
     private float transitionDelay = 1f;
@@ -49,4 +55,31 @@ public class MenuScreenController : MonoBehaviour
         Debug.Log(" Carregue Competição");
     }
 
+    public void InitialExitBehaviour()
+    {
+        Button[] buttons = FindObjectOfType<Canvas>().gameObject.GetComponentsInChildren<Button>();
+
+        // Make anything child of canvas not interactable.
+        foreach (Button button in buttons)
+        {
+            button.enabled = false;
+        }
+
+
+        ToggleObjectsFromParent(m_exitPopup.transform, true);
+    }
+
+    public void ToggleObjectsFromParent(Transform transform, bool boolean)
+    {
+        transform.gameObject.SetActive(boolean);
+        foreach(Transform child in transform)
+        {
+            ToggleObjectsFromParent(child, boolean);
+        }
+    }
+
+    void ProfileBehaviour()
+    {
+        Debug.Log("Profile creation/edit");
+    }
 }
