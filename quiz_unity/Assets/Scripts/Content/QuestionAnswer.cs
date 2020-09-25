@@ -7,6 +7,8 @@ public class QuestionAnswer
     public char[] Answer { get; set; }
     public char[] Result { get; set; }
 
+    public int NumberOfCorrects { get; set; }
+
     public QuestionAnswer(int n)
     {
         Answer = new char[n];
@@ -21,6 +23,7 @@ public class QuestionAnswer
             Answer[i] = '-';
             Result[i] = 'N';
         }
+        NumberOfCorrects = 0;
     }
 
     private void SetPlayerAnswer(char answer, char result, int i)
@@ -65,6 +68,7 @@ public class QuestionAnswer
             if(isCorrect)
             {
                 SetPlayerAnswer(answer, 'C', q);
+                NumberOfCorrects++;
             }
             else
             {
@@ -78,6 +82,7 @@ public class QuestionAnswer
                 if (isCorrect)
                 {
                     SetPlayerAnswer(answer, 'C', q);
+                    NumberOfCorrects++;
                 }
                 else
                 {

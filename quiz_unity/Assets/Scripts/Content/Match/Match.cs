@@ -2,7 +2,9 @@
 {
     private int _quiz_id;         /* Referência; */
     private int _player_id;       /* Referência; */
-    private int correctAnswers;
+
+    public int Id { get; set; }
+    private int Score { get; set; }
     /* Stopwatch watch; */
 
     public Match(int _quiz_id, int _player_id)
