@@ -17,11 +17,17 @@ public class NetController : MonoBehaviour
         
     }
 
-    // Funções:
-    // 1) Requisição do quiz.
-    //  1.1) inicia-se download
-    //  1.2) falha 
-    //      1.2.1 Tentar de novo
-    //      1.2.2 desistir -> voltar
-    
+    // TO DO:
+    public bool RequestQuiz(string quizCode)
+    {
+
+        // Funções:
+        // 1) Realiza a requisição
+        // 1.1) inicia-se download (sem erros) -> true.
+        // 1.2) falha 
+        //      1.2.1 Tentar de novo (até um certo limite de tempo).
+        //      1.2.2 desistir -> voltar
+
+        return true;
+    }
 }

@@ -10,16 +10,25 @@ public class ResultGameController : MonoBehaviour
     private QuestionAnswer questionAnswer;
     private ResultPool resultPool;
 
+    // Result Screen
     public GameObject m_prefab_container;
     public GameObject lowerWrapper;
     public GameObject upperWrapper;
     public GameObject starWrapper;
-
     public Sprite litStar;
 
     private GameObject leftStar;
     private GameObject centralStar;
     private GameObject rightStar;
+
+    // Specific Feedback
+    public GameObject especificFeedbackWrapper;
+    public GameObject questionNumberBox;
+    public GameObject questionDesctiptionBox;
+    public GameObject questionAnswerText;
+    public GameObject returnToResultsButton;
+
+
 
     void Awake()
     {
@@ -34,6 +43,7 @@ public class ResultGameController : MonoBehaviour
         questionAnswer = dataController.GetQuestionAnswers();
         resultPool = FindObjectOfType<ResultPool>();
         generateAnswers();
+
     }
 
     void Start()
@@ -106,6 +116,49 @@ public class ResultGameController : MonoBehaviour
 
     void generateAnswers()
     {
-        resultPool.GetComponent<ResultPool>().InstantiateResults(questionAnswer, lowerWrapper.transform);
+        resultPool.GetComponent<ResultPool>().InstantiateResults(
+            dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().Questions
+            , questionAnswer, 
+            lowerWrapper.transform);
+    }
+
+    public void GetSpecificFeedback(GameObject alternativeFeedback)
+    {
+        AnswerFeedbackData answerFeedback = alternativeFeedback.GetComponent<AnswerFeedbackButton>().AnswerFeedbackData;
+
+        // Set backgroundColor
+        especificFeedbackWrapper.GetComponent<Image>().color = answerFeedback.BackgroundColor;
+
+        // SetLabelCorlor (2)
+        questionNumberBox.GetComponentInChildren<Text>().text = "Questão " + answerFeedback.QuestionNumber.ToString();
+        questionNumberBox.GetComponent<Image>().color = answerFeedback.LabelColor;
+
+        returnToResultsButton.GetComponent<Image>().color = answerFeedback.LabelColor;
+        // SetQuestionDescrtiption
+
+        questionDesctiptionBox.GetComponentInChildren<Text>().text = answerFeedback.QuestionDescription;
+
+        //TO DO: SetQuestionExplanation
+
+        SwapToSpecificFeedback();
+    }
+
+    public void SwapToSpecificFeedback()
+    {        
+        ToggleObject(especificFeedbackWrapper.transform,true);
+    }
+
+    public void SwapToGeneralsResults()
+    {
+        ToggleObject(especificFeedbackWrapper.transform, false);
+    }
+
+    private void ToggleObject(Transform transform, bool flag)
+    {
+        transform.gameObject.SetActive(flag);
+        foreach(Transform child in transform)
+        {
+            ToggleObject(child,flag);
+        }
     }
 }

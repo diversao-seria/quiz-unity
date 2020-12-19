@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Runtime.CompilerServices;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -34,7 +33,7 @@ public class MenuScreenController : MonoBehaviour
 
     void ClassicBehaviour()
     {
-        StartCoroutine(TransitionAnimation("Game"));
+        StartCoroutine(TransitionAnimation("PreGame"));
     }
 
     IEnumerator TransitionAnimation(string scene)

@@ -1,0 +1,92 @@
+{ "questions":[
+	{
+	 "text":"Como uma pessoa saudável é infectada?",
+	 "alternativesNumber":5,
+	 "alternatives":[    
+        {"id":1, "content":"Tendo contato direto com outra pessoa já infectada", "QuestionType": 0, "isCorrect": false},    
+        {"id":2, "content":"Sendo mordida por um cachorro infectado", "QuestionType": 0, "isCorrect": false},  
+        {"id":3, "content":"Sendo picada por um vetor (mosquito palha) infectado", "QuestionType": 0, "isCorrect": true},    
+        {"id":4, "content":"Bebendo água contaminada", "QuestionType": 0, "isCorrect": false}	
+     ]  
+	},
+		{
+	 "text":"Quem pode transmitir a doença?",
+	 "alternativesNumber":5,
+	 "alternatives":[    
+        {"id":1, "content":"Qualquer mosquito", "QuestionType": 0, "isCorrect": false},    
+        {"id":2, "content":"Qualquer mosquito infectado", "QuestionType": 0, "isCorrect": false},  
+        {"id":3, "content":"Qualquer mosquito palha", "QuestionType": 0, "isCorrect": false},    
+        {"id":4, "content":"Só o mosquito palha infectado", "QuestionType": 0, "isCorrect": true}	
+     ]
+	},
+	{
+	 "text":"Como o vetor (mosquito palha) infectado transmite a doença?",
+	 "alternativesNumber":5,
+	 "alternatives":[    
+        {"id":1, "content":"Colocando seus ovos em água que depois é bebida", "QuestionType": 0, "isCorrect": false},    
+        {"id":2, "content":"Colocando seus ovos em comida que depois é ingerida", "QuestionType": 0, "isCorrect": false},  
+        {"id":3, "content":"Tendo contato direto com a pessoa", "QuestionType": 0, "isCorrect": false},    
+        {"id":4, "content":"Picando a pessoa", "QuestionType": 0, "isCorrect": true}	
+     ] 
+   },
+   {
+      "text":"Quem pode contrair a doença?",
+      "alternativesNumber":5,
+      "alternatives":[    
+          {"id":1, "content":"Humanos, plantas, peixes e insetos", "QuestionType": 0, "isCorrect": false},    
+          {"id":2, "content":"Humanos, cachorros, raposas e marsupiais", "QuestionType": 0, "isCorrect": false},  
+          {"id":3, "content":"Humanos, porcos, vacas e galinhas", "QuestionType": 0, "isCorrect": false},    
+          {"id":4, "content":"Picando a pessoa", "QuestionType": 0, "isCorrect": true}	
+      ] 
+   },
+   {
+      "text":"Como o vetor (mosquito palha) é infectado?",
+      "alternativesNumber":5,
+      "alternatives":[    
+          {"id":1, "content":"Picando animais infectados", "QuestionType": 0, "isCorrect": true},    
+          {"id":2, "content":"Se reproduzindo com outros mosquitos já infectados", "QuestionType": 0, "isCorrect": false},  
+          {"id":3, "content":"Pousando em locais infectados", "QuestionType": 0, "isCorrect": false},    
+          {"id":4, "content":"Comendo comida infectada", "QuestionType": 0, "isCorrect": false}	
+      ] 
+   },
+   {
+      "text":"Quanto tempo entre a pessoa ser picada e ter sintomas?",
+      "alternativesNumber":5,
+      "alternatives":[    
+          {"id":1, "content":"Poucas horas (3 - 5 horas)", "QuestionType": 0, "isCorrect": false},    
+          {"id":2, "content":"Alguns dias (5 - 10 dias)", "QuestionType": 0, "isCorrect": false},  
+          {"id":3, "content":"Alguns meses (5 - 10 meses)", "QuestionType": 0, "isCorrect": false},    
+          {"id":4, "content":"Varia muito de pessoa a pessoa entre (10 dias - 24 meses)", "QuestionType": 0, "isCorrect": true}	
+      ] 
+   },
+   {
+      "text":"Quanto tempo entre o cão ser picado e ter sintomas?",
+      "alternativesNumber":5,
+      "alternatives":[    
+          {"id":1, "content":"Varia muito (3 meses - muitos anos)", "QuestionType": 0, "isCorrect": true},    
+          {"id":2, "content":"Poucas horas (3 - 5 horas)", "QuestionType": 0, "isCorrect": false},  
+          {"id":3, "content":"Alguns meses (5 -10 meses)", "QuestionType": 0, "isCorrect": false},    
+          {"id":4, "content":"Até um ano ", "QuestionType": 0, "isCorrect": false}	
+      ] 
+   },
+   {
+      "text":"O mosquito palha (vetor) é ativo principalmente:",
+      "alternativesNumber":5,
+      "alternatives":[    
+          {"id":1, "content":"Durante o dia, no resto do tempo fica no sol para se aquecer", "QuestionType": 0, "isCorrect": false},    
+          {"id":2, "content":"Durante o dia, no resto do tempo fica em lugares sombreados e úmidos", "QuestionType": 0, "isCorrect": false},  
+          {"id":3, "content":"Durante a noite e nascer/pôr-do-sol, no resto do tempo fica no sol para se aquecer", "QuestionType": 0, "isCorrect": false},    
+          {"id":4, "content":"Durante a noite e nascer/pôr-do-sol, no resto do tempo fica em lugares sombreados e úmidos", "QuestionType": 0, "isCorrect": true}	
+      ] 
+   },
+   {
+      "text":" Quais são os sintomas principais para determinar que uma pessoa tem Leishmaniose?",
+      "alternativesNumber":5,
+      "alternatives":[    
+          {"id":1, "content":"Inchaço excessivo da barriga (mais especificamente do baço e do fígado)", "QuestionType": 0, "isCorrect": true},    
+          {"id":2, "content":"Dores nas juntas e coceiras", "QuestionType": 0, "isCorrect": false},  
+          {"id":3, "content":"Dores de ouvido e tontura", "QuestionType": 0, "isCorrect": false},    
+          {"id":4, "content":"Febres muito altas que passam e voltam", "QuestionType": 0, "isCorrect": false}	
+      ] 
+   }
+]}

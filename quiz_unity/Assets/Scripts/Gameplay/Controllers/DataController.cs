@@ -6,35 +6,27 @@ using System.IO;
 using Newtonsoft.Json;
 using System;
 
-public class DataController : MonoBehaviour 
+public class DataController : MonoBehaviour
 {
 	private RoundData[] allRoundData;
 	private PlayerProgress playerProgress;
 	private string gameDataFileName = "data.json";
 	private Quiz currentQuiz;
+	private string filenameJSON;
 
-	// Só para testes.
-	public string path;
-	public string filenameJSON = "ExampleJSON.json";
+	public NetController netController;
 
-	void Start ()  
+	void Start()
 	{
-
-		DontDestroyOnLoad (gameObject);
-
+		DontDestroyOnLoad(gameObject);
 		LoadGameData();
 		LoadPlayerProgress();
-		
-		QuestionData questions = retrieveQuestions();
-		currentQuiz = new Quiz(questions, "123456");
-		
-		
 		SceneManager.LoadScene("MenuScreen");
 	}
-	
+
 	public RoundData GetCurrentRoundData()
 	{
-		return allRoundData [0];
+		return allRoundData[0];
 	}
 
 	public void SubmitNewScore(int newScore)
@@ -68,7 +60,9 @@ public class DataController : MonoBehaviour
 
 	private void LoadGameData()
 	{
-		string filePath = Path.Combine(Application.streamingAssetsPath, gameDataFileName);
+		//string filePath = Path.Combine(Application.streamingAssetsPath, gameDataFileName);
+		string filePath = Application.streamingAssetsPath + "/" + gameDataFileName;
+		Debug.Log("path: " + filePath);
 
 		if(File.Exists(filePath))
 		{
@@ -85,9 +79,23 @@ public class DataController : MonoBehaviour
 
 	// Não veio com o projeto:
 
+	public void PreLoadQuiz(string quizCode)
+    {
+		filenameJSON = quizCode + ".json";
+		QuestionData questions = retrieveQuestions(quizCode);
+		currentQuiz = new Quiz(questions, quizCode);
+	}
+
 	public Quiz RetrieveQuiz()
 	{
 		return currentQuiz;
+	}
+
+	private QuestionData retrieveQuestions(string quizCode)
+	{
+		QuestionData questionsData = IntializationOfAllObjects();
+		questionsData = getContentFromFile();
+		return questionsData;
 	}
 
 	private QuestionData IntializationOfAllObjects()
@@ -96,23 +104,17 @@ public class DataController : MonoBehaviour
 		return questionData;
     }
 
-	private QuestionData retrieveQuestions()
-    {
-		QuestionData questionsData = IntializationOfAllObjects();
-		questionsData = getContentFromFile();
-		return questionsData;
-	}
-
 	private QuestionData getContentFromFile()
 	{
 		string json = readFromJson();
-		Debug.Log(json);
 		return JsonConvert.DeserializeObject<QuestionData>(json);
 	}
 
 	private string readFromJson()
 	{
-		return System.IO.File.ReadAllText(path + filenameJSON);
+		return System.IO.File.ReadAllText(Path.Combine(
+			Application.streamingAssetsPath, filenameJSON
+			));
 	}
 
 	public void TrackQuestionsAnswers(int n)
