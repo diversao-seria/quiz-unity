@@ -13,11 +13,13 @@ public class DataController : MonoBehaviour
 	private string gameDataFileName = "data.json";
 	private Quiz currentQuiz;
 	private string filenameJSON;
+	private char slash;
 
 	public NetController netController;
 
 	void Start()
 	{
+		setFilenamePathChar();
 		DontDestroyOnLoad(gameObject);
 		LoadGameData();
 		LoadPlayerProgress();
@@ -125,5 +127,14 @@ public class DataController : MonoBehaviour
 	public QuestionAnswer GetQuestionAnswers()
     {
 		return playerProgress.GetQuestionAnswers();
+    }
+
+	private void setFilenamePathChar()
+    {
+		slash = '/';
+		if (Application.platform == RuntimePlatform.WindowsPlayer)
+        {
+			slash = '\\';
+        }
     }
 }

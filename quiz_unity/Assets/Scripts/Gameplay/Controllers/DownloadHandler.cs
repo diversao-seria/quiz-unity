@@ -28,7 +28,7 @@ public class DownloadHandler : MonoBehaviour
         UnityWebRequest www = UnityWebRequest.Get(serverAdress + ":" + serverPort);
         yield return www.SendWebRequest();
 
-        if (www.isNetworkError || www.isHttpError)
+        if (www.isNetworkError || www.isHttpError) // Deprecated
         {
             Debug.Log(www.error);
         }
@@ -47,7 +47,7 @@ public class DownloadHandler : MonoBehaviour
         UnityWebRequest www = UnityWebRequest.Get(serverAdress + "/" + fileName);
         yield return www.SendWebRequest();
 
-        if (www.isNetworkError)
+        if (www.isNetworkError) // Deprecated
         {
             Debug.Log(www.error);
         }
