@@ -3,4 +3,4 @@
 
 ## Tecnologias utilizadas
 
-* **Unity**: Versão 2019.4.3f1
+* **Unity**: Versão 2021.1.3f1
