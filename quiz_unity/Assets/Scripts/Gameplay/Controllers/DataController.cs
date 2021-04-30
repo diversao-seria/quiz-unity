@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using System.IO;
 using Newtonsoft.Json;
 using System;
+using UnityEngine.Networking;
 
 public class DataController : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class DataController : MonoBehaviour
 
 	public NetController netController;
 
+	
+
 	void Start()
 	{
 		setFilenamePathChar();
@@ -24,6 +27,7 @@ public class DataController : MonoBehaviour
 		LoadGameData();
 		LoadPlayerProgress();
 		SceneManager.LoadScene("MenuScreen");
+		
 	}
 
 	public RoundData GetCurrentRoundData()

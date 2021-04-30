@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.IO;
+using UnityEngine.Networking;
 
 public class PreGameController : MonoBehaviour
 {
@@ -22,7 +23,7 @@ public class PreGameController : MonoBehaviour
 
     void Start()
     {
-   
+        
     }
 
     // Update is called once per frame
@@ -34,6 +35,7 @@ public class PreGameController : MonoBehaviour
     public void CheckForQuiz()
     {
         string quizCode = inputText.GetComponent<Text>().text;
+        StartCoroutine(GetFile(quizCode));
 
         // Net Controller Search routine.
         netController.GetComponent<NetController>().RequestQuiz(quizCode);
@@ -66,5 +68,23 @@ public class PreGameController : MonoBehaviour
     private void StartQuiz()
     {
         SceneManager.LoadScene("Game");
+    }
+
+    IEnumerator GetFile(string file_name)
+    {
+        string url = "http://localhost/api/" + file_name + ".json"; 
+        using (UnityWebRequest www = UnityWebRequest.Get(url))
+        {
+            yield return www.SendWebRequest();
+            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                string savePath = string.Format("{0}/{1}.json", Application.streamingAssetsPath, file_name); //set file path
+                System.IO.File.WriteAllText(savePath, www.downloadHandler.text); //download file
+            }
+        }
     }
 }
