@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PopupHandler : MonoBehaviour
+public class ExitHandler : MonoBehaviour
 {
     public GameObject screenController;
     public GameObject m_exitPopup;
