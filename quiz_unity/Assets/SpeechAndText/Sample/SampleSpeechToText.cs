@@ -15,10 +15,10 @@ public class SampleSpeechToText : MonoBehaviour
     public Text txtRate;
     void Start()
     {
-        Setting("en-US");
+        //Setting("en-US");
+        Setting("pt-BR");
         loading.SetActive(false);
         SpeechToText.instance.onResultCallback = OnResultSpeech;
-
     }
     
 
@@ -50,15 +50,15 @@ public class SampleSpeechToText : MonoBehaviour
     }
     public void OnClickSpeak()
     {
-        TextToSpeech.instance.StartSpeak(inputText.text);
+        TextToSpeech.Instance.StartSpeak(inputText.text);
     }
     public void  OnClickStopSpeak()
     {
-        TextToSpeech.instance.StopSpeak();
+        TextToSpeech.Instance.StopSpeak();
     }
     public void Setting(string code)
     {
-        TextToSpeech.instance.Setting(code, pitch, rate);
+        TextToSpeech.Instance.Setting(code, pitch, rate);
         SpeechToText.instance.Setting(code);
         txtLocale.text = "Locale: " + code;
         txtPitch.text = "Pitch: " + pitch;

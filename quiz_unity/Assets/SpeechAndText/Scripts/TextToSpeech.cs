@@ -10,7 +10,7 @@ namespace TextSpeech
     {
         #region Init
         static TextToSpeech _instance;
-        public static TextToSpeech instance
+        public static TextToSpeech Instance
         {
             get
             {
@@ -23,10 +23,10 @@ namespace TextSpeech
         }
         public static void Init()
         {
-            if (instance != null) return;
-            GameObject obj = new GameObject();
-            obj.name = "TextToSpeech";
-            _instance = obj.AddComponent<TextToSpeech>();
+            //if (instance != null) return;
+            //GameObject obj = new GameObject();
+            //obj.name = "TextToSpeech";
+            //_instance = obj.AddComponent<TextToSpeech>();
         }
         void Awake()
         {

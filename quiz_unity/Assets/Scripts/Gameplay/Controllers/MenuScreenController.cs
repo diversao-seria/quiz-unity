@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using TextSpeech;
 
 public class MenuScreenController : MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class MenuScreenController : MonoBehaviour
     public EventSystem eventSystem;
 
 
+
     void Awake()
     {
         m_classic.onClick.AddListener(ClassicBehaviour);
@@ -33,6 +35,8 @@ public class MenuScreenController : MonoBehaviour
 
     void ClassicBehaviour()
     {
+        SpeechController.Instance.StartSpeaking(m_classic.GetComponentInChildren<Text>().text);
+        TextToSpeech.Instance.StartSpeak("Pre Game");
         StartCoroutine(TransitionAnimation("PreGame"));
     }
 
@@ -46,11 +50,13 @@ public class MenuScreenController : MonoBehaviour
 
     void SurvivalBehaviour()
     {
-        Debug.Log(" Carregue Survival");
+        SpeechController.Instance.StartSpeaking(m_survival.GetComponentInChildren<Text>().text);
+        Debug.Log("Carregue Survival");
     }
 
     void CompetitionBehaviour()
     {
+        SpeechController.Instance.StartSpeaking(m_competition.GetComponentInChildren<Text>().text);
         Debug.Log(" Carregue Competição");
     }
 

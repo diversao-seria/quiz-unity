@@ -1,5 +1,5 @@
 sceneSetups:
-- path: Assets/Scenes/Persistent.unity
+- path: Assets/Scenes/ConfigScreen.unity
   isLoaded: 1
   isActive: 1
   isSubScene: 0
