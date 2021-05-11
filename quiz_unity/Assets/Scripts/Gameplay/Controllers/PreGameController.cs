@@ -4,25 +4,29 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.IO;
+using UnityEngine.Networking;
 
 public class PreGameController : MonoBehaviour
 {
     private DataController dataController;
     private NetController netController;
 
+    public GameObject errorController;
     public Button m_startButton;
     public Text inputText;
+    public string errorText = "Erro ao baixar o arquivo!";
 
     void Awake()
     {
         m_startButton.onClick.AddListener(CheckForQuiz);
         dataController = FindObjectOfType<DataController>();
         netController = FindObjectOfType<NetController>();
+        
     }
 
     void Start()
     {
-   
+        
     }
 
     // Update is called once per frame
@@ -34,19 +38,12 @@ public class PreGameController : MonoBehaviour
     public void CheckForQuiz()
     {
         string quizCode = inputText.GetComponent<Text>().text;
+        StartCoroutine(GetFile(quizCode));
 
         // Net Controller Search routine.
         netController.GetComponent<NetController>().RequestQuiz(quizCode);
 
-        // Check if quiz's json is in correct place. 
-        if (isQuizAvailable(quizCode))
-        {
-            LoadQuiz(quizCode);
-        }
-        else
-        {
-            // Display a popup message informing the user (Goes here).
-        }
+        
     }
 
     private bool isQuizAvailable(string quizCode)
@@ -66,5 +63,35 @@ public class PreGameController : MonoBehaviour
     private void StartQuiz()
     {
         SceneManager.LoadScene("Game");
+    }
+
+    IEnumerator GetFile(string quizCode)
+    {
+        string url = "http://localhost/api/" + quizCode + ".json"; 
+        using (UnityWebRequest www = UnityWebRequest.Get(url))
+        {
+            yield return www.SendWebRequest();
+            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            {
+                errorText = "Erro ao baixar o arquivo.\n" + www.error.ToString();
+                yield return null;
+            }
+            else
+            {
+                string savePath = string.Format("{0}/{1}.json", Application.streamingAssetsPath, quizCode); //set file path
+                System.IO.File.WriteAllText(savePath, www.downloadHandler.text); //download file
+            }
+
+            // Check if quiz's json is in correct place. 
+            if (isQuizAvailable(quizCode))
+            {
+                LoadQuiz(quizCode);
+            }
+            else
+            {
+                Debug.Log(errorText);
+                errorController.GetComponent<PopupHandler>().InitialExitBehaviour("error");               
+            }
+        }
     }
 }

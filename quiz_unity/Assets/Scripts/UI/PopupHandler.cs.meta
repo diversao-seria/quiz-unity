@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 78f2d77e2c249cb4ea7ca65702cef42b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - screenController: {instanceID: 0}
+  - m_exitPopup: {instanceID: 0}
+  - m_errorPopup: {fileID: 6965550560684027606, guid: 5aa616e386d62fd4da3bc8d46b167565,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
