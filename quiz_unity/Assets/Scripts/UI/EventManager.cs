@@ -14,7 +14,7 @@ public class EventManager : MonoBehaviour
     // FIM-ENQUANTO
     // slider = 0.0;
 
-    private Clock holdTouchClock;
+    private PressClock holdTouchClock;
     private bool wasTouched;
     public float answerConfirmation = 3.0f;   // in seconds
     public Slider progressSlider;
@@ -22,7 +22,7 @@ public class EventManager : MonoBehaviour
     public void Awake()
     {
         wasTouched = false;
-        holdTouchClock = new Clock(0);
+        holdTouchClock = new PressClock(0);
     }
 
     public void Update()
