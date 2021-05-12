@@ -94,4 +94,36 @@ public class PreGameController : MonoBehaviour
             }
         }
     }
+
+    // db: unityTest
+    // table: playerruns
+    // ID (P)(int), TemponoQuiz (string - varchar), RespostasCorretas (int)
+
+    /* 
+    IEnumerator SendForm()
+    {
+
+        int exampleID = 111;
+        string exampleTime = "00:00:30";
+        int exampleCorrect = 5;
+
+        List<IMultipartFormSection> formData = new List<IMultipartFormSection>();
+        // formData.Add(new MultipartFormDataSection("ID=" + exampleID.ToString() + "&" + "TemponoQuiz=" + exampleTime + "&" + "RespostasCorretas=" + exampleCorrect.ToString()));
+        formData.Add(new MultipartFormFileSection("my file data", "myfile.txt"));
+
+        UnityWebRequest www = UnityWebRequest.Post("http://www.my-server.com/myform", formData);
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log(www.error);
+        }
+        else
+        {
+            Debug.Log("Form upload complete!");
+        }
+
+        
+    }
+    */
 }

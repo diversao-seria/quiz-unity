@@ -1,4 +1,6 @@
-{ "questions":[
+{
+   "QuestionTime": 30.0,
+   "questions":[
 	{
 	 "text":"Como uma pessoa saudável é infectada?",
 	 "alternativesNumber":5,
@@ -89,4 +91,5 @@
           {"id":4, "content":"Febres muito altas que passam e voltam", "QuestionType": 0, "isCorrect": false}	
       ] 
    }
-]}
+]
+}

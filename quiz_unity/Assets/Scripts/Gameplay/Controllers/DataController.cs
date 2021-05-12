@@ -83,37 +83,21 @@ public class DataController : MonoBehaviour
 		}
 	}
 
-	// Não veio com o projeto:
+	// Didn't come with the example.
 
 	public void PreLoadQuiz(string quizCode)
     {
 		filenameJSON = quizCode + ".json";
-		QuestionData questions = retrieveQuestions(quizCode);
-		currentQuiz = new Quiz(questions, quizCode);
-	}
-
-	public Quiz RetrieveQuiz()
-	{
-		return currentQuiz;
-	}
-
-	private QuestionData retrieveQuestions(string quizCode)
-	{
-		QuestionData questionsData = IntializationOfAllObjects();
-		questionsData = getContentFromFile();
-		return questionsData;
-	}
-
-	private QuestionData IntializationOfAllObjects()
-    {
 		QuestionData questionData = new QuestionData();
-		return questionData;
-    }
+		questionData = getContentFromFile();
+		Debug.Log("QuestionTime: " + questionData.QuestionTime);
+		currentQuiz = new Quiz(questionData, quizCode);
+	}
 
 	private QuestionData getContentFromFile()
 	{
-		string json = readFromJson();
-		return JsonConvert.DeserializeObject<QuestionData>(json);
+		string jsonData = readFromJson();
+		return JsonConvert.DeserializeObject<QuestionData>(jsonData);
 	}
 
 	private string readFromJson()
@@ -121,6 +105,21 @@ public class DataController : MonoBehaviour
 		return System.IO.File.ReadAllText(Path.Combine(
 			Application.streamingAssetsPath, filenameJSON
 			));
+	}
+	private void setFilenamePathChar()
+	{
+		slash = '/';
+		if (Application.platform == RuntimePlatform.WindowsPlayer)
+		{
+			slash = '\\';
+		}
+	}
+
+	// Access Handlers
+
+	public Quiz RetrieveQuiz()
+	{
+		return currentQuiz;
 	}
 
 	public void TrackQuestionsAnswers(int n)
@@ -131,14 +130,5 @@ public class DataController : MonoBehaviour
 	public QuestionAnswer GetQuestionAnswers()
     {
 		return playerProgress.GetQuestionAnswers();
-    }
-
-	private void setFilenamePathChar()
-    {
-		slash = '/';
-		if (Application.platform == RuntimePlatform.WindowsPlayer)
-        {
-			slash = '\\';
-        }
     }
 }
