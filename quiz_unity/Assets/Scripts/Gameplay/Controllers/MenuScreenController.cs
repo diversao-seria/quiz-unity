@@ -7,7 +7,7 @@ using TextSpeech;
 
 public class MenuScreenController : MonoBehaviour
 {
-    public Button m_classic, m_survival, m_competition;
+    public Button m_classic, m_survival, m_competition, m_configIcon;
 
     public Image m_profile, m_exit;
 
@@ -26,6 +26,7 @@ public class MenuScreenController : MonoBehaviour
         m_classic.onClick.AddListener(ClassicBehaviour);
         m_survival.onClick.AddListener(SurvivalBehaviour);
         m_competition.onClick.AddListener(CompetitionBehaviour);
+        m_configIcon.onClick.AddListener(ConfigurationBehaviour);
     }
 
     void Update()
@@ -58,6 +59,13 @@ public class MenuScreenController : MonoBehaviour
     {
         SpeechController.Instance.StartSpeaking(m_competition.GetComponentInChildren<Text>().text);
         Debug.Log(" Carregue Competição");
+    }
+
+    void ConfigurationBehaviour()
+    {
+        SpeechController.Instance.StartSpeaking(m_configIcon.GetComponentInChildren<Text>().text);
+        TextToSpeech.Instance.StartSpeak("Configurações");
+        StartCoroutine(TransitionAnimation("ConfigScreen"));
     }
 
     public void InitialExitBehaviour()
