@@ -39,7 +39,7 @@ public class PowerUpButton : MonoBehaviour
         powerUpController.RemovePowerUp(this.gameObject);*/
 
         powerUpController.UsePowerUp(powerUpName);
-        //powerUpController.RemovePowerUp(this.gameObject);
+        powerUpController.RemovePowerUp(this.gameObject);
 
     }
 }
