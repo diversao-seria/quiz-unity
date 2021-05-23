@@ -8,7 +8,7 @@ using System.IO;
 
 public class MenuScreenController : MonoBehaviour
 {
-    public Button m_classic, m_survival, m_competition;
+    public Button m_classic, m_survival, m_competition, m_config;
 
     public Image m_profile, m_exit;
 
@@ -31,6 +31,7 @@ public class MenuScreenController : MonoBehaviour
         m_classic.onClick.AddListener(ClassicBehaviour);
         m_survival.onClick.AddListener(SurvivalBehaviour);
         m_competition.onClick.AddListener(CompetitionBehaviour);
+        m_config.onClick.AddListener(ConfigurationBehaviour);
         //Simulating data loading
         Load();
     }
@@ -42,6 +43,7 @@ public class MenuScreenController : MonoBehaviour
 
     void ClassicBehaviour()
     {
+        SpeechController.Instance.StartSpeaking(m_classic.GetComponentInChildren<Text>().text);
         StartCoroutine(TransitionAnimation("PreGame"));
         //Simulating data saving
         volume++;
@@ -60,13 +62,22 @@ public class MenuScreenController : MonoBehaviour
 
     void SurvivalBehaviour()
     {
+        SpeechController.Instance.StartSpeaking(m_survival.GetComponentInChildren<Text>().text);
         Debug.Log(" Carregue Survival");
     }
 
     void CompetitionBehaviour()
     {
+        SpeechController.Instance.StartSpeaking(m_competition.GetComponentInChildren<Text>().text);
         Debug.Log(" Carregue Competição");
     }
+
+    void ConfigurationBehaviour()
+    {
+        SpeechController.Instance.StartSpeaking(m_config.GetComponentInChildren<Text>().text);
+        StartCoroutine(TransitionAnimation("ConfigScreen"));
+    }
+
 
     public void InitialExitBehaviour()
     {
