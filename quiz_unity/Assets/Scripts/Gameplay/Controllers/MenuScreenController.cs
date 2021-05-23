@@ -32,7 +32,6 @@ public class MenuScreenController : MonoBehaviour
         m_survival.onClick.AddListener(SurvivalBehaviour);
         m_competition.onClick.AddListener(CompetitionBehaviour);
         m_config.onClick.AddListener(ConfigurationBehaviour);
-        //Simulating data loading
         Load();
     }
 
@@ -77,7 +76,6 @@ public class MenuScreenController : MonoBehaviour
         SpeechController.Instance.StartSpeaking(m_config.GetComponentInChildren<Text>().text);
         StartCoroutine(TransitionAnimation("ConfigScreen"));
     }
-
 
     public void InitialExitBehaviour()
     {

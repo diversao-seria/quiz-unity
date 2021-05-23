@@ -7,9 +7,9 @@ public class AnswerButton : MonoBehaviour
 {
 	public Text answerText;
 	public AnswerButton answerButton;
+	public Alternative alternative;
 
 	private GameController gameController;
-	private Alternative alternative;
 	private Color color;
 	private int alternativeNumber;
 
