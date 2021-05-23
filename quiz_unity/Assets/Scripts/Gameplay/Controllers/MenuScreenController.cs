@@ -3,6 +3,8 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System;
+using System.IO;
 
 public class MenuScreenController : MonoBehaviour
 {
@@ -18,6 +20,11 @@ public class MenuScreenController : MonoBehaviour
     private float transitionDelay = 1f;
     public EventSystem eventSystem;
 
+    //experimental variables
+    private int volume = 0;
+    private int brightness = 0;
+    private bool yn = true;
+
 
     void Awake()
     {
@@ -25,6 +32,7 @@ public class MenuScreenController : MonoBehaviour
         m_survival.onClick.AddListener(SurvivalBehaviour);
         m_competition.onClick.AddListener(CompetitionBehaviour);
         m_config.onClick.AddListener(ConfigurationBehaviour);
+        Load();
     }
 
     void Update()
@@ -36,6 +44,11 @@ public class MenuScreenController : MonoBehaviour
     {
         SpeechController.Instance.StartSpeaking(m_classic.GetComponentInChildren<Text>().text);
         StartCoroutine(TransitionAnimation("PreGame"));
+        //Simulating data saving
+        volume++;
+        brightness++;
+        yn = !yn;
+        Save();
     }
 
     IEnumerator TransitionAnimation(string scene)
@@ -91,4 +104,56 @@ public class MenuScreenController : MonoBehaviour
     {
         Debug.Log("Profile creation/edit");
     }
+
+    void Save()
+    {
+        string path = Application.streamingAssetsPath + "\\settings.json";
+
+        Settings settings = new Settings(); 
+        settings.volume = volume;
+        settings.brightness = brightness;
+        settings.yn = yn;
+
+        string[] Lines = File.ReadAllLines(path); // Replacing the first line of the settings file
+        Lines[0] = settings.ReturnSettings();
+        File.WriteAllLines(path, Lines);
+    }
+    void Load()
+    {
+        string path = Application.streamingAssetsPath + "\\settings.json";
+
+        if (File.Exists(path))
+        {
+            Settings settingsData = new Settings();
+            StreamReader reader = new StreamReader(path);
+            settingsData = JsonUtility.FromJson<Settings>(reader.ReadLine());
+            reader.Close();
+            volume = settingsData.volume;
+            brightness = settingsData.brightness;
+            yn = settingsData.yn;
+        }
+        else
+        {
+            StreamWriter writer = File.CreateText(path);
+            writer.WriteLine("Placeholder Text");
+            writer.Close();
+        }
+        
+    }
 }
+
+public class Settings
+{
+    //save class with experimental variables
+
+    public int volume = 0;
+    public int brightness = 0;
+    public bool yn = true;
+    
+   
+    public string ReturnSettings()
+    {
+        return JsonUtility.ToJson(this);
+    }
+}
+
