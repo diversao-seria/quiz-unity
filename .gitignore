@@ -2,15 +2,15 @@
 #
 # Get latest from https://github.com/github/gitignore/blob/master/Unity.gitignore
 #
-/[Ll]ibrary/
-/[Tt]emp/
-/[Oo]bj/
-/[Bb]uild/
-/[Bb]uilds/
-/[Ll]ogs/
-/[Mm]emoryCaptures/
-/[Uu]serSettings/
-/[Ll]ogs/
+/quiz_unity/[Ll]ibrary/
+/quiz_unity/[Tt]emp/
+/quiz_unity/[Oo]bj/
+/quiz_unity/[Bb]uild/
+/quiz_unity/[Bb]uilds/
+/quiz_unity/[Ll]ogs/
+/quiz_unity/[Mm]emoryCaptures/
+/quiz_unity/[Uu]serSettings/
+/quiz_unity/[Ll]ogs/
 
 # Never ignore Asset meta data
 !/[Aa]ssets/**/*.meta
