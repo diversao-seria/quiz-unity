@@ -22,16 +22,20 @@ public class PowerUpController : MonoBehaviour
     [HideInInspector]
     public List<GameObject> powerUpGameObjects = new List<GameObject>();
     public GameObject Background;
+    public int a1, a2;
+    public int[] randomIndex;
 
+    private JsonController jsonController;
     private bool airPowerUp = false;
-    private int[] randomIndex, indexArray;
+    private int[] indexArray;
     private Image bg;
     private Color grey = new Color(0.35294117647f, 0.35294117647f, 0.35294117647f);
     private GameObject[] answers;
 
-        // Start is called before the first frame update
+    // Start is called before the first frame update
     void Start()
     {
+        jsonController = FindObjectOfType<JsonController>();
         bg = Background.GetComponent<Image>();
         bg.color = grey;
         RestoreAllPowerUps();
@@ -48,7 +52,7 @@ public class PowerUpController : MonoBehaviour
         if (isCorrect)
         {
             rightAnswerCount++;
-            if(rightAnswerCount == fireComboNumber)
+            if (rightAnswerCount == fireComboNumber)
             {
                 Debug.Log("Fire");
                 bg.color = Color.red;
@@ -100,7 +104,7 @@ public class PowerUpController : MonoBehaviour
 
     public void RemoveAllPowerUps()
     {
-        while(powerUpGameObjects.Count > 0)
+        while (powerUpGameObjects.Count > 0)
         {
             RemovePowerUp(powerUpGameObjects[0]);
         }
@@ -117,7 +121,7 @@ public class PowerUpController : MonoBehaviour
         PowerUpButton powerUpButton = powerUpGameObject.GetComponent<PowerUpButton>();
         button.onClick.AddListener(delegate { powerUpButton.HandleClick(); });
         powerUpButton.powerUpName = pw.name;
-        powerUpGameObject.GetComponentInChildren<Image>().color = pw.color; 
+        powerUpGameObject.GetComponentInChildren<Image>().color = pw.color;
     }
 
     public void RemovePowerUp(GameObject pw)
@@ -139,6 +143,7 @@ public class PowerUpController : MonoBehaviour
     public void WaterPowerUp()
     {
         timeFreeze = true;
+        jsonController.hab3++;
     }
 
     public void AirPowerUp()
@@ -148,7 +153,7 @@ public class PowerUpController : MonoBehaviour
 
         airPowerUp = true;
 
-        for(int i = 0; i < answers.Length; i++)
+        for (int i = 0; i < answers.Length; i++)
         {
             AnswerButton answerButton = answers[i].GetComponent<AnswerButton>();
             if (!answerButton.alternative.IsCorrect)
@@ -160,19 +165,22 @@ public class PowerUpController : MonoBehaviour
         indexArray = indexes.ToArray();
         randomIndex = ReturnRandomIndexes(indexArray, airRemovedAnswers);
 
-        for (int i = 0; i< airRemovedAnswers; i++)
+        for (int i = 0; i < airRemovedAnswers; i++)
         {
-            
+
             answers[indexArray[randomIndex[i]]].GetComponent<Image>().enabled = false;
             answers[indexArray[randomIndex[i]]].GetComponent<Button>().enabled = false;
             answers[indexArray[randomIndex[i]]].GetComponent<EventManager>().enabled = false;
             answers[indexArray[randomIndex[i]]].transform.GetChild(0).gameObject.SetActive(false);
         }
+
+        jsonController.hab1++;
     }
 
     public void EarthPowerUp()
     {
         leafImmunity = true;
+        jsonController.hab2++;
     }
 
     private int[] ReturnRandomIndexes(int[] indexes, int n)
@@ -185,7 +193,7 @@ public class PowerUpController : MonoBehaviour
             int random;
             do
             {
-                random = Random.Range(1, indexes.Length+1);
+                random = Random.Range(1, indexes.Length + 1);
             }
             while (randomIndexes.Contains(random));
             randomIndexes[i] = random;
@@ -204,7 +212,7 @@ public class PowerUpController : MonoBehaviour
     public void UsePowerUp(string name)
     {
         PowerUps pw = new PowerUps();
-        for(int i = 0; i < powerUps.Count; i++)
+        for (int i = 0; i < powerUps.Count; i++)
         {
             if (powerUps[i].name == name)
             {
