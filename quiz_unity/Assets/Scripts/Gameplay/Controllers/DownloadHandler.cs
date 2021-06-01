@@ -9,7 +9,7 @@ using UnityEngine.Networking;
 
 public class DownloadHandler : MonoBehaviour
 {
-    const String serverAdress = "http://127.0.0.1";
+    const String serverAdress = "https://ds-quiz.herokuapp.com/quiz?code=XXXX";
     const String serverPort = "80";
 
     void Start()
