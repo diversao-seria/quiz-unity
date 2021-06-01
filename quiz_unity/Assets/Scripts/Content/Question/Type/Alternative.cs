@@ -6,14 +6,14 @@ using Newtonsoft.Json;
 public class Alternative
 {
     [JsonProperty("id")]
-    public int Id { get; set; }
+    public int ID { get; set; }
 
-    [JsonProperty("content")]
+    [JsonProperty("text")]
     public string Content { get; set; }
 
     [JsonProperty("QuestionType")]
     public int QuestionType { get; set; }
 
-    [JsonProperty("isCorrect")]
+    [JsonProperty("correct")]
     public bool IsCorrect { get; set; }
 }

@@ -58,7 +58,8 @@ public class GameController : MonoBehaviour
 
 		powerUpController = this.gameObject.GetComponent<PowerUpController>();
 
-		questionClock = new QuestionClock(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
+		// questionClock = new QuestionClock(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
+		questionClock = new QuestionClock(30);
 		quizClock = new QuizClock(0);
 
 		UpdateTimeRemainingDisplay(questionClock);
@@ -260,7 +261,8 @@ public class GameController : MonoBehaviour
 		{
 			questionIndex++;
 			questionNumberTextController.GetComponent<QuestionNumberController>().NextQuestion();
-			questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
+			// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
+			questionClock.NewCountdown(30);
 			ShowQuestion();
 
 			ShowQuestionNumber();

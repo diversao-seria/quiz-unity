@@ -3,6 +3,15 @@ using Newtonsoft.Json;
 
 public class QuestionData
 {
+    [JsonProperty("id")]
+    public int ID { get; set; }
+
+    [JsonProperty("code")]
+    public string Code { get; set; }
+
+    [JsonProperty("title")]
+    public string Title { get; set; }
+
     [JsonProperty("QuestionTime")]
     public float QuestionTime { get; set; }
 

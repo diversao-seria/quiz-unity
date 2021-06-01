@@ -67,7 +67,7 @@ public class PreGameController : MonoBehaviour
 
     IEnumerator GetFile(string quizCode)
     {
-        string url = "http://localhost/api/" + quizCode + ".json"; 
+        string url = "https://ds-quiz.herokuapp.com/quiz?code=" + quizCode;
         using (UnityWebRequest www = UnityWebRequest.Get(url))
         {
             yield return www.SendWebRequest();
