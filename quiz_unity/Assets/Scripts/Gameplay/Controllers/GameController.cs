@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Xml.Schema;
 using System.IO;
 
+
 public class GameController : MonoBehaviour
 {
 	public SimpleObjectPool answerButtonObjectPool;
@@ -31,10 +32,14 @@ public class GameController : MonoBehaviour
 	private bool isRoundActive = false;
 	private bool isQuestionAnswered = false;
 
+	private List<string> sequencia_atuacao = new List<string>();
+	private string source = "Q-0-1-H-0-0-0-AE-0-T-0-S-0";
+	private int h1 = 0, h2 = 0, h3 = 0;
 	private int rightAnswers;
 	private int playerScore;
 	private int questionIndex;
 	private List<GameObject> answerButtonGameObjects = new List<GameObject>();
+	private int streak = 0;
 
 	private QuestionClock questionClock;
 	private QuizClock quizClock;
@@ -71,6 +76,7 @@ public class GameController : MonoBehaviour
 		ShowQuestion();
 		ShowQuestionNumber();
 
+		jsonController.startTime = System.DateTime.Now.ToString();		// records the current system time and date
 		isRoundActive = true;
 	}
 
@@ -136,6 +142,7 @@ public class GameController : MonoBehaviour
 	{
 		isQuestionAnswered = true;
 
+
 		dataController.GetQuestionAnswers().RegisterPlayerAnswer(
 				eventManager,
 				isQuestionAnswered,
@@ -151,8 +158,48 @@ public class GameController : MonoBehaviour
 		{
 			playerScore += currentRoundData.pointsAddedForCorrectAnswer;                    // If the AnswerButton that was clicked was the correct answer, add points
 			scoreDisplay.text = playerScore.ToString();
+			jsonController.rightAnswers++;
+			streak++;
+		}
+		else
+		{
+			jsonController.wrongAnswers++;
 		}
 
+		if (streak > jsonController.streak)
+		{
+			jsonController.streak = streak;
+		}
+		string[] parts = source.Split('-');													// Separates the source string, which will be used to create "sequencia_atuacao"
+		parts[1] = (questionIndex + 1).ToString().PadLeft(2, '0');
+		parts[8] = (alternativeNumber + 1).ToString();										
+		parts[10] = System.Math.Round(25 - questionClock.Time).ToString().PadLeft(3, '0');	// This edits each part of the string
+		parts[12] = System.Convert.ToByte(isCorrect).ToString();
+		string hab = "";
+		if (jsonController.hab1 != h1)                                                      // Checks if any power ups have been used during this round
+		{
+			h1 = jsonController.hab1;
+			hab = "1";
+			parts[5] = powerUpController.randomIndex[0].ToString();
+			parts[6] = powerUpController.randomIndex[1].ToString();
+		}
+		else if (jsonController.hab2 != h2)
+		{
+			h2 = jsonController.hab2;
+			hab = "2";
+		}
+		else if (jsonController.hab3 != h3)
+		{
+			h3 = jsonController.hab3;
+			hab = "3";
+		}
+		else
+		{
+			hab = "0";
+		}
+		parts[4] = hab;
+
+		sequencia_atuacao.Add(string.Join("", parts));										// This puts every part of the separated source string together, creating a new string which will be saved in the .json file.
 
 		StartCoroutine(VisualFeedback(isCorrect));
 	}
@@ -179,8 +226,7 @@ public class GameController : MonoBehaviour
 			File.Delete("QuizAnswerData.json"); // Making sure there's only one file at one point in time
 		}
 		jsonController.score = playerScore;
-		jsonController.time = quizClock.HHmmss();
-		jsonController.rightAnswers = rightAnswers;
+		jsonController.sequencia_atuacao = sequencia_atuacao;
 		StreamWriter writer = File.CreateText(Application.streamingAssetsPath + "\\QuizAnswerData.json");
 		writer.WriteLine(jsonController.SaveToString());
 		writer.Close();
@@ -204,6 +250,7 @@ public class GameController : MonoBehaviour
 		else
 		{
 			feedbackImage.GetComponent<Image>().sprite = wrongAnswerIcon;
+			streak = 0;
 		}
 
 		feedbackImage.gameObject.SetActive(true);
