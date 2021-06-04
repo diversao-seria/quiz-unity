@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class AnswerFeedbackButton : MonoBehaviour
 {
-    // Start is called before the first frame update
     private ResultGameController resultGameController;
 
     public AnswerFeedbackData AnswerFeedbackData { get; set; }
@@ -17,6 +16,5 @@ public class AnswerFeedbackButton : MonoBehaviour
     public void HandleFeedbackClick()
     {
         resultGameController.GetComponent<ResultGameController>().GetSpecificFeedback(transform.gameObject);
-        
     }
 }

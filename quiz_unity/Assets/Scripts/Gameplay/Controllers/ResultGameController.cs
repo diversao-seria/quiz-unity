@@ -24,7 +24,8 @@ public class ResultGameController : MonoBehaviour
     // Specific Feedback
     public GameObject especificFeedbackWrapper;
     public GameObject questionNumberBox;
-    public GameObject questionDesctiptionBox;
+    public GameObject questionNumberText;
+    public GameObject questionDescriptionText;
     public GameObject questionAnswerText;
     public GameObject returnToResultsButton;
 
@@ -36,9 +37,6 @@ public class ResultGameController : MonoBehaviour
         leftStar = starWrapper.transform.Find("LeftStar").gameObject;
         centralStar = starWrapper.transform.Find("CentralStar").gameObject;
         rightStar = starWrapper.transform.Find("RightStar").gameObject;
-
-
-
         dataController = FindObjectOfType<DataController>();
         questionAnswer = dataController.GetQuestionAnswers();
         resultPool = FindObjectOfType<ResultPool>();
@@ -124,19 +122,22 @@ public class ResultGameController : MonoBehaviour
 
     public void GetSpecificFeedback(GameObject alternativeFeedback)
     {
+        if (alternativeFeedback == null)
+            Debug.Log("Square colored object isnull!");
         AnswerFeedbackData answerFeedback = alternativeFeedback.GetComponent<AnswerFeedbackButton>().AnswerFeedbackData;
 
         // Set backgroundColor
         especificFeedbackWrapper.GetComponent<Image>().color = answerFeedback.BackgroundColor;
 
         // SetLabelCorlor (2)
-        questionNumberBox.GetComponentInChildren<Text>().text = "Questão " + answerFeedback.QuestionNumber.ToString();
+        questionNumberText.GetComponent<Text>().text = "Questão " + answerFeedback.QuestionNumber.ToString();
+
         questionNumberBox.GetComponent<Image>().color = answerFeedback.LabelColor;
 
         returnToResultsButton.GetComponent<Image>().color = answerFeedback.LabelColor;
         // SetQuestionDescrtiption
 
-        questionDesctiptionBox.GetComponentInChildren<Text>().text = answerFeedback.QuestionDescription;
+        questionDescriptionText.GetComponent<Text>().text = answerFeedback.QuestionDescription;
 
         //TO DO: SetQuestionExplanation
 
