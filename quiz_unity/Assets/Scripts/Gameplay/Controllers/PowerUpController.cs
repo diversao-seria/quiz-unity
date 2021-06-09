@@ -24,7 +24,9 @@ public class PowerUpController : MonoBehaviour
     public GameObject Background;
     public int a1, a2;
     public int[] randomIndex;
+    public AudioClip[] audioClips;
 
+    private AudioSource audioSource;
     private JsonController jsonController;
     private bool airPowerUp = false;
     private int[] indexArray;
@@ -32,9 +34,17 @@ public class PowerUpController : MonoBehaviour
     private Color grey = new Color(0.35294117647f, 0.35294117647f, 0.35294117647f);
     private GameObject[] answers;
 
+    private enum Clip : int
+    {
+        water,
+        air,
+        earth
+    }
+
     // Start is called before the first frame update
     void Start()
     {
+        audioSource = gameObject.GetComponent<AudioSource>();
         jsonController = FindObjectOfType<JsonController>();
         bg = Background.GetComponent<Image>();
         bg.color = grey;
@@ -44,7 +54,7 @@ public class PowerUpController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        
     }
 
     public void AnswerCount(bool isCorrect)
@@ -225,14 +235,17 @@ public class PowerUpController : MonoBehaviour
         if (pw.name == "Water")
         {
             WaterPowerUp();
+            audioSource.PlayOneShot(audioClips[(int)Clip.water]);
         }
         else if (pw.name == "Air")
         {
             AirPowerUp();
+            audioSource.PlayOneShot(audioClips[(int)Clip.air]);
         }
         else if (pw.name == "Earth")
         {
             EarthPowerUp();
+            audioSource.PlayOneShot(audioClips[(int)Clip.earth]);
         }
     }
 }

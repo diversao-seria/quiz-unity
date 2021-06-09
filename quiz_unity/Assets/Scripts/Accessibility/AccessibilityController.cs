@@ -52,13 +52,11 @@ public class AccessibilityController : MonoBehaviour
         //DontDestroyOnLoad(gameObject);
 
         // load values from memory
-        //ACCESSIBILITY = PlayerPrefs.GetInt("ACCESSIBILITY") == 1 ? true : false;
-        //HIGH_CONTRAST = PlayerPrefs.GetInt("HIGH_CONTRAST") == 1 ? true : false;
+        ACCESSIBILITY = PlayerPrefs.GetInt("ACCESSIBILITY") == 1 ? true : false;
+        HIGH_CONTRAST = PlayerPrefs.GetInt("HIGH_CONTRAST") == 1 ? true : false;
 
 
         Init();
-
-        ACCESSIBILITY = true;
     }
 
     public static void Init()
