@@ -37,7 +37,8 @@ public class PreGameController : MonoBehaviour
 
     public void CheckForQuiz()
     {
-        string quizCode = inputText.GetComponent<Text>().text;
+        // put quizcode on upper case
+        string quizCode = inputText.GetComponent<Text>().text.ToUpper();
         StartCoroutine(GetFile(quizCode));
 
         // Net Controller Search routine.
