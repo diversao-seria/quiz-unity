@@ -21,11 +21,13 @@ public class GameController : MonoBehaviour
 	public Image feedbackImage;
 	public Sprite correctAnswerIcon;
 	public Sprite wrongAnswerIcon;
+	public AudioClip[] audioClips;
 
 	private DataController dataController;
 	private RoundData currentRoundData;
 	private JsonController jsonController;
 	private PowerUpController powerUpController;
+	private AudioSource audioSource;
 
 	private List<Question> questionPool;  // Question are going here.
 
@@ -44,11 +46,20 @@ public class GameController : MonoBehaviour
 	private QuestionClock questionClock;
 	private QuizClock quizClock;
 
+	enum Clip : int
+    {
+		correct,
+		wrong,
+		// power ups
+    }
+
 	void Start()
 	{
 		jsonController = FindObjectOfType<JsonController>();
 
 		dataController = FindObjectOfType<DataController>();        // Store a reference to the DataController so we can request the data we need for this round
+
+		audioSource = gameObject.GetComponent<AudioSource>();
 
 		// powerUpController = FindObjectOfType<PowerUpController>();
 
@@ -159,10 +170,14 @@ public class GameController : MonoBehaviour
 			scoreDisplay.text = playerScore.ToString();
 			jsonController.rightAnswers++;
 			streak++;
+			// Add correct feedback audio
+			audioSource.PlayOneShot(audioClips[(int)Clip.correct]);
 		}
 		else
 		{
 			jsonController.wrongAnswers++;
+			// Add wrong feedback audio
+			audioSource.PlayOneShot(audioClips[(int)Clip.wrong]);
 		}
 
 		if (streak > jsonController.streak)
