@@ -118,6 +118,8 @@ public class ResultGameController : MonoBehaviour
             dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().Questions
             , questionAnswer, 
             lowerWrapper.transform);
+
+
     }
 
     public void GetSpecificFeedback(GameObject alternativeFeedback)

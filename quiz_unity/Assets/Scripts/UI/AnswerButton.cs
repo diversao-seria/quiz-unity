@@ -6,18 +6,26 @@ using System;
 public class AnswerButton : MonoBehaviour
 {
 	public Text answerText;
-	public AnswerButton answerButton;
 	public Alternative alternative;
+	public Slider progressSlider;
 
 	private GameController gameController;
+	private EventManager eventManager;
 	private Color color;
 	private int alternativeNumber;
 
 	void Start()
 	{
 		gameController = FindObjectOfType<GameController>();
+		eventManager = gameController.GetComponent<EventManager>();
+
 		color = GetComponent<Image>().color;
 	}
+
+	public void HandlePressDown()
+    {
+		eventManager.buttonTouched(this);
+    }
 
 	public void SetUp(Alternative alternative, int alternativeNumber)
 	{
@@ -26,8 +34,9 @@ public class AnswerButton : MonoBehaviour
 		this.alternativeNumber = alternativeNumber;
 	}
 
+	// AnswerClick
 	public void HandleClick()
 	{
-		gameController.AnswerButtonClicked(alternative.IsCorrect, alternativeNumber, GetComponent<EventManager>());
+		gameController.AnswerButtonClicked(alternative.IsCorrect, alternativeNumber);
 	}
 }

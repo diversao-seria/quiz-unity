@@ -28,6 +28,7 @@ public class GameController : MonoBehaviour
 	private JsonController jsonController;
 	private PowerUpController powerUpController;
 	private AudioSource audioSource;
+	private EventManager eventManager;
 
 	private List<Question> questionPool;  // Question are going here.
 
@@ -60,6 +61,8 @@ public class GameController : MonoBehaviour
 		dataController = FindObjectOfType<DataController>();        // Store a reference to the DataController so we can request the data we need for this round
 
 		audioSource = gameObject.GetComponent<AudioSource>();
+		eventManager = GetComponent<EventManager>();
+
 
 		// powerUpController = FindObjectOfType<PowerUpController>();
 
@@ -108,7 +111,7 @@ public class GameController : MonoBehaviour
 				}
 				else
 				{
-					AnswerButtonClicked(false, -1, null);
+					AnswerButtonClicked(false, -1);
 				}
 			}
 		}
@@ -132,6 +135,8 @@ public class GameController : MonoBehaviour
 
 			answerButton.SetUp(question.Alternatives[i], i);                           // Pass the AnswerData to the AnswerButton so the AnswerButton knows what text to display and whether it is the correct answer
 		}
+
+		eventManager.SetAlternativesReference(answerButtonGameObjects);
 	}
 
 	public void ShowQuestionNumber()
@@ -148,7 +153,7 @@ public class GameController : MonoBehaviour
 		}
 	}
 
-	public void AnswerButtonClicked(bool isCorrect, int alternativeNumber, EventManager eventManager)
+	public void AnswerButtonClicked(bool isCorrect, int alternativeNumber)
 	{
 		isQuestionAnswered = true;
 
@@ -270,7 +275,6 @@ public class GameController : MonoBehaviour
 		feedbackImage.gameObject.SetActive(true);
 		yield return new WaitForSeconds(3);
 		feedbackImage.gameObject.SetActive(false);
-		isQuestionAnswered = false;
 
 		if (questionPool.Count > questionIndex + 1)                                         // If there are more questions, show the next question
 		{
@@ -281,6 +285,8 @@ public class GameController : MonoBehaviour
 			ShowQuestion();
 
 			ShowQuestionNumber();
+			isQuestionAnswered = false;
+			eventManager.questionDone();
 		}
 		else                                                                                // If there are no more questions, the round ends
 		{
