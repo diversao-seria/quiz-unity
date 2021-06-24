@@ -121,7 +121,8 @@ public class PowerUpController : MonoBehaviour
         PowerUpButton powerUpButton = powerUpGameObject.GetComponent<PowerUpButton>();
         button.onClick.AddListener(delegate { powerUpButton.HandleClick(); });
         powerUpButton.powerUpName = pw.name;
-        powerUpGameObject.GetComponentInChildren<Image>().color = pw.color;
+        //powerUpGameObject.GetComponentInChildren<Image>().color = pw.color;
+        powerUpGameObject.GetComponentInChildren<Image>().sprite = pw.icon;
     }
 
     public void RemovePowerUp(GameObject pw)
