@@ -14,7 +14,6 @@ public class DataController : MonoBehaviour
 	private string gameDataFileName = "data.json";
 	private Quiz currentQuiz;
 	private string filenameJSON;
-	private char slash;
 
 	public NetController netController;
 
@@ -22,7 +21,6 @@ public class DataController : MonoBehaviour
 
 	void Start()
 	{
-		setFilenamePathChar();
 		DontDestroyOnLoad(gameObject);
 		LoadGameData();
 		LoadPlayerProgress();
@@ -67,7 +65,9 @@ public class DataController : MonoBehaviour
 	private void LoadGameData()
 	{
 		//string filePath = Path.Combine(Application.streamingAssetsPath, gameDataFileName);
-		string filePath = Application.streamingAssetsPath + "/" + gameDataFileName;
+		string filePath = Application.streamingAssetsPath + Path.AltDirectorySeparatorChar + gameDataFileName;
+
+
 		Debug.Log("path: " + filePath);
 
 		if(File.Exists(filePath))
@@ -85,34 +85,29 @@ public class DataController : MonoBehaviour
 
 	// Didn't come with the example.
 
+	// Populate all relevant classes with the JSON provided.
 	public void PreLoadQuiz(string quizCode)
     {
 		filenameJSON = quizCode + ".json";
+
 		QuestionData questionData = new QuestionData();
-		questionData = getContentFromFile();
+
+		questionData = getContentFromFile(quizCode);
 		Debug.Log("QuestionTime: " + questionData.QuestionTime);
 		currentQuiz = new Quiz(questionData, quizCode);
 	}
 
-	private QuestionData getContentFromFile()
+	private QuestionData getContentFromFile(string quizCode)
 	{
-		string jsonData = readFromJson();
+		string jsonData = readFromJson(quizCode);
 		return JsonConvert.DeserializeObject<QuestionData>(jsonData);
 	}
 
-	private string readFromJson()
+	private string readFromJson(string quizCode)
 	{
 		return System.IO.File.ReadAllText(Path.Combine(
-			Application.streamingAssetsPath, filenameJSON
+			Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.QuizFolderRelativePath, quizCode + ".json"
 			));
-	}
-	private void setFilenamePathChar()
-	{
-		slash = '/';
-		if (Application.platform == RuntimePlatform.WindowsPlayer)
-		{
-			slash = '\\';
-		}
 	}
 
 	// Access Handlers

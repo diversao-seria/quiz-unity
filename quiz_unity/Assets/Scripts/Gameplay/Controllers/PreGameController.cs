@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.IO;
 using UnityEngine.Networking;
+using System.Text;
 
 public class PreGameController : MonoBehaviour
 {
@@ -20,8 +21,7 @@ public class PreGameController : MonoBehaviour
     {
         m_startButton.onClick.AddListener(CheckForQuiz);
         dataController = FindObjectOfType<DataController>();
-        netController = FindObjectOfType<NetController>();
-        
+        netController = FindObjectOfType<NetController>();      
     }
 
     void Start()
@@ -50,7 +50,7 @@ public class PreGameController : MonoBehaviour
     private bool isQuizAvailable(string quizCode)
     {
         return File.Exists(Path.Combine(
-            Application.streamingAssetsPath, quizCode + ".json"
+            Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.QuizFolderRelativePath, quizCode + ".json"
             ));
     }
 
@@ -79,8 +79,66 @@ public class PreGameController : MonoBehaviour
             }
             else
             {
-                string savePath = string.Format("{0}/{1}.json", Application.streamingAssetsPath, quizCode); //set file path
-                System.IO.File.WriteAllText(savePath, www.downloadHandler.text); //download file
+                FileStream fileStream;
+
+                // Build path quiz directory
+                string path = Application.persistentDataPath + Path.AltDirectorySeparatorChar
+                    + DataManagementConstant.QuizFolderRelativePath + quizCode + ".json";
+                Debug.Log("path: " + path);
+
+                // If folder for quiz exists, then try to write normally. Otherwise, crate the necessary folders before writing.
+                try 
+                { 
+                    using (fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
+                    {
+                        StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.UTF8);
+                        streamWriter.Write(www.downloadHandler.text);
+                        streamWriter.Close();
+                        Debug.Log("Arquivo armazenado com sucesso");
+                    }
+                   
+                }
+                catch(DirectoryNotFoundException dirE)
+                {
+                    // This exception is thrown if if there is no quiz folder.
+                    Debug.Log(dirE.GetType().Name + ".\n Caminho não existente. Criando...");
+
+                    // Get the current path for application
+                    string currentPath = Application.persistentDataPath;
+
+                    // Break relative path to separate the necessary folders for creation.
+                    string[] folderList = DataManagementConstant.QuizFolderRelativePath.Split(Path.AltDirectorySeparatorChar);
+                  
+                    try
+                    {
+                        // For each folder candidate, add in the current path and create folder. Stops when empty string (after the last separator)
+                        foreach (string folderCandidate in folderList)
+                        {
+                            if (string.Equals(folderCandidate,"")) break;
+                            currentPath = currentPath + Path.AltDirectorySeparatorChar  + folderCandidate;
+                            System.IO.Directory.CreateDirectory(currentPath);
+                        }
+
+                        // With the path sorted out, create the file and write it.
+                        fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
+                        StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.UTF8);
+                        streamWriter.Write(www.downloadHandler.text);
+                        streamWriter.Close();
+                    }
+                    catch(IOException ioE)
+                    {
+                        // Exception when problems related to writting occurs (like disk is full)
+                        Debug.Log(ioE.GetType().Name + "Erro ao escrever pastas/arquivos. Tentar de novo ou armazenamento está cheio.");
+                        // TO DO:  Feedback Visual.
+                    }
+
+                }
+                catch (IOException ioE)
+                {
+                    // Exception when problems related to writting occurs (like disk is full)
+                    Debug.Log(ioE.GetType().Name + "Erro ao escrever pastas/arquivos. Tentar de novo ou armazenamento está cheio.");
+                    // TO DO:  Feedback Visual.
+                }
             }
 
             // Check if quiz's json is in correct place. 
