@@ -58,11 +58,12 @@ public class PreGameController : MonoBehaviour
     {
         // TO DO: make user wait
         dataController.GetComponent<DataController>().PreLoadQuiz(quizCode);
-        StartQuiz();
+        StartQuiz(quizCode);
     }
 
-    private void StartQuiz()
+    private void StartQuiz(string quizCode)
     {
+        SetUpRoundData(quizCode);
         SceneManager.LoadScene("Game");
     }
 
@@ -79,66 +80,13 @@ public class PreGameController : MonoBehaviour
             }
             else
             {
-                FileStream fileStream;
 
                 // Build path quiz directory
                 string path = Application.persistentDataPath + Path.AltDirectorySeparatorChar
                     + DataManagementConstant.QuizFolderRelativePath + quizCode + ".json";
                 Debug.Log("path: " + path);
 
-                // If folder for quiz exists, then try to write normally. Otherwise, crate the necessary folders before writing.
-                try 
-                { 
-                    using (fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
-                    {
-                        StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.UTF8);
-                        streamWriter.Write(www.downloadHandler.text);
-                        streamWriter.Close();
-                        Debug.Log("Arquivo armazenado com sucesso");
-                    }
-                   
-                }
-                catch(DirectoryNotFoundException dirE)
-                {
-                    // This exception is thrown if if there is no quiz folder.
-                    Debug.Log(dirE.GetType().Name + ".\n Caminho não existente. Criando...");
-
-                    // Get the current path for application
-                    string currentPath = Application.persistentDataPath;
-
-                    // Break relative path to separate the necessary folders for creation.
-                    string[] folderList = DataManagementConstant.QuizFolderRelativePath.Split(Path.AltDirectorySeparatorChar);
-                  
-                    try
-                    {
-                        // For each folder candidate, add in the current path and create folder. Stops when empty string (after the last separator)
-                        foreach (string folderCandidate in folderList)
-                        {
-                            if (string.Equals(folderCandidate,"")) break;
-                            currentPath = currentPath + Path.AltDirectorySeparatorChar  + folderCandidate;
-                            System.IO.Directory.CreateDirectory(currentPath);
-                        }
-
-                        // With the path sorted out, create the file and write it.
-                        fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
-                        StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.UTF8);
-                        streamWriter.Write(www.downloadHandler.text);
-                        streamWriter.Close();
-                    }
-                    catch(IOException ioE)
-                    {
-                        // Exception when problems related to writting occurs (like disk is full)
-                        Debug.Log(ioE.GetType().Name + "Erro ao escrever pastas/arquivos. Tentar de novo ou armazenamento está cheio.");
-                        // TO DO:  Feedback Visual.
-                    }
-
-                }
-                catch (IOException ioE)
-                {
-                    // Exception when problems related to writting occurs (like disk is full)
-                    Debug.Log(ioE.GetType().Name + "Erro ao escrever pastas/arquivos. Tentar de novo ou armazenamento está cheio.");
-                    // TO DO:  Feedback Visual.
-                }
+                dataController.GetComponent<DataController>().WriteOnPath(path, www.downloadHandler.text);
             }
 
             // Check if quiz's json is in correct place. 
@@ -152,6 +100,27 @@ public class PreGameController : MonoBehaviour
                 errorController.GetComponent<PopupHandler>().InitialExitBehaviour("error");               
             }
         }
+    }
+
+    void SetUpRoundData(string quizCode)
+    {
+
+        RoundData roundData = new RoundData();
+
+        string folderPath = Application.persistentDataPath + Path.AltDirectorySeparatorChar +
+            DataManagementConstant.PlayerDataFolder + Path.AltDirectorySeparatorChar + quizCode;
+
+        // Crate Directory for quiz player data.
+        if (!Directory.Exists(folderPath))
+        {
+            System.IO.Directory.CreateDirectory(folderPath);
+        }
+        string filePath = folderPath + Path.AltDirectorySeparatorChar + "data.json";
+
+        roundData.FilePath = filePath;
+        roundData.FolderPath = folderPath;
+
+        dataController.CurrentRoundData = roundData;
     }
 
     // db: unityTest

@@ -66,7 +66,7 @@ public class GameController : MonoBehaviour
 
 		// powerUpController = FindObjectOfType<PowerUpController>();
 
-		currentRoundData = dataController.GetCurrentRoundData();                       // Ask the DataController for the data for the current round. At the moment, we only have one round - but we could extend this
+		currentRoundData = dataController.CurrentRoundData;                      // Ask the DataController for the data for the current round. At the moment, we only have one round - but we could extend this
 		questionPool = dataController.RetrieveQuiz().GetQuestionData().Questions;      // Take a copy of the questions so we could shuffle the pool or drop questions from it without affecting the original RoundData object
 		dataController.TrackQuestionsAnswers(questionPool.Count);
 
@@ -171,7 +171,7 @@ public class GameController : MonoBehaviour
 
 		if (isCorrect)
 		{
-			playerScore += currentRoundData.pointsAddedForCorrectAnswer;                    // If the AnswerButton that was clicked was the correct answer, add points
+			playerScore += currentRoundData.CurrentPoints;                    // If the AnswerButton that was clicked was the correct answer, add points
 			scoreDisplay.text = playerScore.ToString();
 			jsonController.rightAnswers++;
 			streak++;
@@ -238,17 +238,24 @@ public class GameController : MonoBehaviour
 		questionDisplay.SetActive(false);
 		roundEndDisplay.SetActive(true);
 
-		// Creating file with quiz results
-		if (File.Exists("QuizAnswerData.json"))
+		string folderPath = currentRoundData.FolderPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerQuizDataFile;
 
+		// Creating file with quiz results
+		if (File.Exists(folderPath))
 		{
-			File.Delete("QuizAnswerData.json"); // Making sure there's only one file at one point in time
+			// Making sure there's only one file at one point in time
+			File.Delete(folderPath); 
 		}
 		jsonController.score = playerScore;
 		jsonController.sequencia_atuacao = sequencia_atuacao;
-		StreamWriter writer = File.CreateText(Application.streamingAssetsPath + "\\QuizAnswerData.json");
-		writer.WriteLine(jsonController.SaveToString());
-		writer.Close();
+
+		dataController.WriteOnPath(currentRoundData.FolderPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerQuizDataFile,
+			jsonController.SaveToString());
+
+
+		// StreamWriter writer = File.CreateText(Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerDataPath);
+		// writer.WriteLine(jsonController.SaveToString());
+		// writer.Close();
 
 		Debug.Log("Total time: " + quizClock.HHmmss());
 		SceneManager.LoadScene("QuizResult");
