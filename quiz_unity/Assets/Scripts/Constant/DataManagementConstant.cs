@@ -8,6 +8,7 @@ public static class DataManagementConstant
 {
     // Files
     public static readonly string PlayerQuizDataFile = "QuizAnswerData.json";
+    public static readonly string UserSettingsFile = "settings.json";
 
     // Folders
     public static readonly string PlayerDataFolder= "PlayerData";

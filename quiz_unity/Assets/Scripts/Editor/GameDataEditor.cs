@@ -6,7 +6,7 @@ using System.IO;
 
 public class GameDataEditor : EditorWindow
 {
-    private string gameDataProjectFilePath = "/StreamingAssets/data.json";
+    private string gameDataProjectFilePath = Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerQuizDataFile;
 
     public GameData gameData;
 

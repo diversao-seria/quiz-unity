@@ -61,7 +61,6 @@ public class DataController : MonoBehaviour
 
 	private void LoadGameData()
 	{
-		//string filePath = Path.Combine(Application.streamingAssetsPath, gameDataFileName);
 		string filePath = Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerDataPath + gameDataFileName;
 		string playerDataFolder = Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerDataPath;
 
