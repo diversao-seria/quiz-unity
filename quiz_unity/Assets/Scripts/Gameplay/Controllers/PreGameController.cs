@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.IO;
 using UnityEngine.Networking;
+using System.Text;
 
 public class PreGameController : MonoBehaviour
 {
@@ -20,8 +21,7 @@ public class PreGameController : MonoBehaviour
     {
         m_startButton.onClick.AddListener(CheckForQuiz);
         dataController = FindObjectOfType<DataController>();
-        netController = FindObjectOfType<NetController>();
-        
+        netController = FindObjectOfType<NetController>();      
     }
 
     void Start()
@@ -50,7 +50,7 @@ public class PreGameController : MonoBehaviour
     private bool isQuizAvailable(string quizCode)
     {
         return File.Exists(Path.Combine(
-            Application.streamingAssetsPath, quizCode + ".json"
+            Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.QuizFolderRelativePath, quizCode + ".json"
             ));
     }
 
@@ -58,11 +58,12 @@ public class PreGameController : MonoBehaviour
     {
         // TO DO: make user wait
         dataController.GetComponent<DataController>().PreLoadQuiz(quizCode);
-        StartQuiz();
+        StartQuiz(quizCode);
     }
 
-    private void StartQuiz()
+    private void StartQuiz(string quizCode)
     {
+        SetUpRoundData(quizCode);
         SceneManager.LoadScene("Game");
     }
 
@@ -79,8 +80,13 @@ public class PreGameController : MonoBehaviour
             }
             else
             {
-                string savePath = string.Format("{0}/{1}.json", Application.streamingAssetsPath, quizCode); //set file path
-                System.IO.File.WriteAllText(savePath, www.downloadHandler.text); //download file
+
+                // Build path quiz directory
+                string path = Application.persistentDataPath + Path.AltDirectorySeparatorChar
+                    + DataManagementConstant.QuizFolderRelativePath + quizCode + ".json";
+                Debug.Log("path: " + path);
+
+                dataController.GetComponent<DataController>().WriteOnPath(path, www.downloadHandler.text);
             }
 
             // Check if quiz's json is in correct place. 
@@ -94,6 +100,28 @@ public class PreGameController : MonoBehaviour
                 errorController.GetComponent<PopupHandler>().InitialExitBehaviour("error");               
             }
         }
+    }
+
+    void SetUpRoundData(string quizCode)
+    {
+
+        RoundData roundData = new RoundData();
+
+        string folderPath = Application.persistentDataPath + Path.AltDirectorySeparatorChar +
+            DataManagementConstant.PlayerDataFolder + Path.AltDirectorySeparatorChar + quizCode;
+
+        // Crate Directory for quiz player data.
+        if (!Directory.Exists(folderPath))
+        {
+            System.IO.Directory.CreateDirectory(folderPath);
+        }
+
+        string filePath = folderPath + Path.AltDirectorySeparatorChar + "data.json";
+
+        roundData.FilePath = filePath;
+        roundData.FolderPath = folderPath;
+
+        dataController.CurrentRoundData = roundData;
     }
 
     // db: unityTest

@@ -43,12 +43,12 @@ public class MenuScreenController : MonoBehaviour
     void ClassicBehaviour()
     {
         SpeechController.Instance.StartSpeaking(m_classic.GetComponentInChildren<Text>().text);
-        StartCoroutine(TransitionAnimation("PreGame"));
         //Simulating data saving
         volume++;
         brightness++;
         yn = !yn;
         Save();
+        StartCoroutine(TransitionAnimation("PreGame"));
     }
 
     IEnumerator TransitionAnimation(string scene)
@@ -107,7 +107,9 @@ public class MenuScreenController : MonoBehaviour
 
     void Save()
     {
-        string path = Application.streamingAssetsPath + "\\settings.json";
+        string path = Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.UserSettingsFile;
+        Debug.Log("settingsPath: " + path);
+
 
         Settings settings = new Settings(); 
         settings.volume = volume;
@@ -120,7 +122,7 @@ public class MenuScreenController : MonoBehaviour
     }
     void Load()
     {
-        string path = Application.streamingAssetsPath + "\\settings.json";
+        string path = Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.UserSettingsFile;
 
         if (File.Exists(path))
         {

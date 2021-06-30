@@ -6,15 +6,16 @@ using System.IO;
 using Newtonsoft.Json;
 using System;
 using UnityEngine.Networking;
+using System.Text;
 
 public class DataController : MonoBehaviour
 {
-	private RoundData[] allRoundData;
+	public RoundData CurrentRoundData { get; set; }
+
 	private PlayerProgress playerProgress;
 	private string gameDataFileName = "data.json";
 	private Quiz currentQuiz;
 	private string filenameJSON;
-	private char slash;
 
 	public NetController netController;
 
@@ -22,17 +23,11 @@ public class DataController : MonoBehaviour
 
 	void Start()
 	{
-		setFilenamePathChar();
 		DontDestroyOnLoad(gameObject);
 		LoadGameData();
 		LoadPlayerProgress();
 		SceneManager.LoadScene("MenuScreen");
 		
-	}
-
-	public RoundData GetCurrentRoundData()
-	{
-		return allRoundData[0];
 	}
 
 	public void SubmitNewScore(int newScore)
@@ -66,53 +61,105 @@ public class DataController : MonoBehaviour
 
 	private void LoadGameData()
 	{
-		//string filePath = Path.Combine(Application.streamingAssetsPath, gameDataFileName);
-		string filePath = Application.streamingAssetsPath + "/" + gameDataFileName;
+		string filePath = Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerDataPath + gameDataFileName;
+		string playerDataFolder = Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerDataPath;
+
+		if (!Directory.Exists(playerDataFolder))
+        {
+			System.IO.Directory.CreateDirectory(Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerDataFolder);
+		}
+
 		Debug.Log("path: " + filePath);
-
-		if(File.Exists(filePath))
-		{
-			string dataAsJson = File.ReadAllText(filePath);
-			GameData loadedData = JsonUtility.FromJson<GameData>(dataAsJson);
-
-			allRoundData = loadedData.allRoundData;
-		}
-		else
-		{
-			Debug.LogError("Cannot load game data!");
-		}
 	}
 
 	// Didn't come with the example.
 
+	public void CreateDirectoryFromPath(string path, string text)
+    {
+		// Get the current path for application
+		string currentPath = Application.persistentDataPath;
+
+		// Break relative path to separate the necessary folders for creation.
+		string[] folderList = DataManagementConstant.QuizFolderRelativePath.Split(Path.AltDirectorySeparatorChar);
+
+		try
+		{
+			// For each folder candidate, add in the current path and create folder. Stops when empty string (after the last separator)
+			foreach (string folderCandidate in folderList)
+			{
+				if (string.Equals(folderCandidate, "")) break;
+				currentPath = currentPath + Path.AltDirectorySeparatorChar + folderCandidate;
+				System.IO.Directory.CreateDirectory(currentPath);
+			}
+
+			// With the path sorted out, create the file and write it.
+			FileStream fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
+			StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.UTF8);
+			streamWriter.Write(text);
+			streamWriter.Close();
+		}
+		catch (IOException ioE)
+		{
+			// Exception when problems related to writting occurs (like disk is full)
+			Debug.Log(ioE.GetType().Name + "Erro ao escrever pastas/arquivos. Tentar de novo ou armazenamento está cheio.");
+			// TO DO:  Feedback Visual.
+		}
+	}
+
+	public void WriteOnPath(string path, string text)
+	{
+
+		FileStream fileStream;
+
+		try
+		{
+			using (fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
+			{
+				StreamWriter streamWriter = new StreamWriter(fileStream, Encoding.UTF8);
+				streamWriter.Write(text);
+				streamWriter.Close();
+				Debug.Log("Arquivo armazenado com sucesso");
+			}
+
+		}
+		catch (DirectoryNotFoundException dirE)
+		{
+			// This exception is thrown if if there is no quiz folder.
+			Debug.Log(dirE.GetType().Name + ".\n Caminho não existente. Criando...");
+
+			CreateDirectoryFromPath(path,text);
+		}
+		catch (IOException ioE)
+		{
+			// Exception when problems related to writting occurs (like disk is full)
+			Debug.Log(ioE.GetType().Name + "Erro ao escrever pastas/arquivos. Tentar de novo ou armazenamento está cheio.");
+			// TO DO:  Feedback Visual.
+		}
+	}
+
+	// Populate all relevant classes with the JSON provided.
 	public void PreLoadQuiz(string quizCode)
     {
 		filenameJSON = quizCode + ".json";
+
 		QuestionData questionData = new QuestionData();
-		questionData = getContentFromFile();
+
+		questionData = getContentFromFile(quizCode);
 		Debug.Log("QuestionTime: " + questionData.QuestionTime);
 		currentQuiz = new Quiz(questionData, quizCode);
 	}
 
-	private QuestionData getContentFromFile()
+	private QuestionData getContentFromFile(string quizCode)
 	{
-		string jsonData = readFromJson();
+		string jsonData = readFromJson(quizCode);
 		return JsonConvert.DeserializeObject<QuestionData>(jsonData);
 	}
 
-	private string readFromJson()
+	private string readFromJson(string quizCode)
 	{
 		return System.IO.File.ReadAllText(Path.Combine(
-			Application.streamingAssetsPath, filenameJSON
+			Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.QuizFolderRelativePath, quizCode + ".json"
 			));
-	}
-	private void setFilenamePathChar()
-	{
-		slash = '/';
-		if (Application.platform == RuntimePlatform.WindowsPlayer)
-		{
-			slash = '\\';
-		}
 	}
 
 	// Access Handlers
