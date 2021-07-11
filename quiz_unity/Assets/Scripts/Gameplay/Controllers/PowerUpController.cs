@@ -96,7 +96,7 @@ public class PowerUpController : MonoBehaviour
             {
                 answers[i].GetComponent<Image>().enabled = true;
                 answers[i].GetComponent<Button>().enabled = true;
-                answers[i].GetComponent<EventManager>().enabled = true;
+                answers[i].GetComponent<EventManager>().enabled = true; //NULL POINTER REF
                 answers[i].transform.GetChild(0).gameObject.SetActive(true);
             }
         }
@@ -180,7 +180,7 @@ public class PowerUpController : MonoBehaviour
 
             answers[indexArray[randomIndex[i]]].GetComponent<Image>().enabled = false;
             answers[indexArray[randomIndex[i]]].GetComponent<Button>().enabled = false;
-            answers[indexArray[randomIndex[i]]].GetComponent<EventManager>().enabled = false;
+            answers[indexArray[randomIndex[i]]].GetComponent<EventManager>().enabled = false; // NULLPOOINTER REF ERROR
             answers[indexArray[randomIndex[i]]].transform.GetChild(0).gameObject.SetActive(false);
         }
 
