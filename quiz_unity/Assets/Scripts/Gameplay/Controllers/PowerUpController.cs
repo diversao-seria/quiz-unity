@@ -133,6 +133,7 @@ public class PowerUpController : MonoBehaviour
         powerUpButton.powerUpName = pw.name;
         //powerUpGameObject.GetComponentInChildren<Image>().color = pw.color;
         powerUpGameObject.GetComponentInChildren<Image>().sprite = pw.icon;
+
     }
 
     public void RemovePowerUp(GameObject pw)

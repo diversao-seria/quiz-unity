@@ -95,7 +95,6 @@ public class GameController : MonoBehaviour
 
 	void Update()
 	{
-		// what is round active?
 		if (isRoundActive && !isQuestionAnswered)
 		{
 			quizClock.IncreaseTime(Time.deltaTime);
