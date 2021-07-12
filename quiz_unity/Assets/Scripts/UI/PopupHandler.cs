@@ -22,6 +22,7 @@ public class ExitHandler : MonoBehaviour
         {
             button.enabled = false;
         }
+
         if (type == "exit")
         {
             ToggleObjectsFromParent(m_exitPopup.transform, true);
