@@ -34,6 +34,7 @@ public class ResultPool : MonoBehaviour
         }
         else if (questionAnswer.Result[i] == 'E')
         {
+            Debug.Log("Definindo cores");
             sLabelColor = Color.red;
             gameObject.GetComponent<Image>().color = sLabelColor;
             sBackgroundColor = new Color(1.0f, 0.8f, 1.0f);

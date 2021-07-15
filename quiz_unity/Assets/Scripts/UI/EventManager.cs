@@ -24,7 +24,7 @@ public class EventManager : MonoBehaviour
     public void Awake()
     {
         wasTouched = false;
-        idleState = true;
+        LetAnswerQuestion();
         holdTouchClock = new PressClock(0);
     }
 
@@ -35,22 +35,21 @@ public class EventManager : MonoBehaviour
             Touch touch = Input.GetTouch(0);
             holdTouchClock.IncreaseTime(Time.deltaTime);
 
-            // TO DO: PEgar o progesss sldier da alternativa que vai alterar o valor de was touched
             progressSlider.value = Math.Min(holdTouchClock.Time / answerConfirmation, 1);
 
             if(holdTouchClock.Time >= answerConfirmation)
             {
                 resetSlider();
-                holdTouchClock.Reset();
+                resetTouchClock();
                 selectedAnswerButton.GetComponent<AnswerButton>().HandleClick();
             }
             else
             {
                 if (Input.touchCount <= 0 || touch.phase == TouchPhase.Ended)
                 {
-                    idleState = true;
+                    LetAnswerQuestion();
                     resetSlider();
-                    holdTouchClock.Reset();
+                    resetTouchClock();
                 }
             }
         }
@@ -60,26 +59,31 @@ public class EventManager : MonoBehaviour
     public void buttonTouched(AnswerButton answerButton)
     {
 
-        if(idleState == true)
+        if(AllowedToAnswer())
         {
             selectedAnswerButton = answerButton;
             progressSlider = (Slider)answerButton.transform.Find("Slider").gameObject.GetComponent<Slider>();
             wasTouched = true;
             progressSlider.gameObject.SetActive(true);
-            idleState = false;
+            LockAnswer();
         }
     }
 
-    private void resetSlider()
+    public void resetSlider()
     {
             wasTouched = false;
             progressSlider.value = 0;
             progressSlider.gameObject.SetActive(false);
     }
 
-    public void questionDone()
+    public void LetAnswerQuestion()
     {
         idleState = true;
+    }
+
+    public void LockAnswer()
+    {
+        idleState = false;
     }
 
     public bool TouchLastStatus()
@@ -87,8 +91,28 @@ public class EventManager : MonoBehaviour
         return wasTouched;
     }
 
+    public bool AllowedToAnswer()
+    {
+        return idleState;
+    }
+
     public void SetAlternativesReference(List <GameObject> answerButtonList)
     {
         this.answerButtonList = answerButtonList;
+    }
+
+    public void resetTouchClock()
+    {
+        holdTouchClock.Reset();
+    }
+
+    public AnswerButton GetAnswerButton()
+    {
+        return selectedAnswerButton;
+    }
+
+    public void ResetLastAnswerButton()
+    {
+        selectedAnswerButton = null;
     }
 }
