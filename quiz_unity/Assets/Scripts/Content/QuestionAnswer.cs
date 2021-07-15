@@ -56,14 +56,16 @@ public class QuestionAnswer
     }
 
 
-    public void RegisterPlayerAnswer(EventManager eventManager, bool isAnswered, bool isCorrect, int q, int a, float timeLeft)
+    public void RegisterPlayerAnswer(EventManager eventManager, bool isCorrect, int q, int alternativeNumber, float timeLeft)
     {
 
         if (!eventManager) return;
 
-        char answer = GetAnswerFromInt(a);
+        char answer = GetAnswerFromInt(alternativeNumber);
 
-        if(isAnswered)
+        Debug.Log("wastouched: " + OutOfTimeWhileAnswering(eventManager));
+
+        if(alternativeNumber != -1)
         {
             if(isCorrect)
             {
@@ -72,12 +74,13 @@ public class QuestionAnswer
             }
             else
             {
+                Debug.Log("Setando como Errada!");
                 SetPlayerAnswer(answer, 'E', q);
             }
         }
         else
         {
-          if(OutOfTimeWhileAnswering(eventManager))
+            if(OutOfTimeWhileAnswering(eventManager))
             {
                 if (isCorrect)
                 {

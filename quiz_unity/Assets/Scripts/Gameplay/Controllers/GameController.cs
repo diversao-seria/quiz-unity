@@ -110,7 +110,17 @@ public class GameController : MonoBehaviour
 				}
 				else
 				{
-					AnswerButtonClicked(false, -1);
+					isQuestionAnswered = true;
+					eventManager.LockAnswer();
+
+					if(eventManager.GetAnswerButton() && eventManager.TouchLastStatus())
+                    {
+						eventManager.GetAnswerButton().HandleClick();
+					}
+					else
+                    {
+						AnswerButtonClicked(false, -1);
+					}
 				}
 			}
 		}
@@ -154,17 +164,17 @@ public class GameController : MonoBehaviour
 
 	public void AnswerButtonClicked(bool isCorrect, int alternativeNumber)
 	{
-		isQuestionAnswered = true;
-
-
 		dataController.GetQuestionAnswers().RegisterPlayerAnswer(
 				eventManager,
-				isQuestionAnswered,
 				isCorrect,
 				questionIndex,
 				alternativeNumber,
 				questionClock.Time
 			);
+
+		eventManager.resetTouchClock();
+		eventManager.resetSlider();
+		eventManager.ResetLastAnswerButton();
 
 		powerUpController.AnswerCount(isCorrect);
 
@@ -292,7 +302,7 @@ public class GameController : MonoBehaviour
 
 			ShowQuestionNumber();
 			isQuestionAnswered = false;
-			eventManager.questionDone();
+			eventManager.LetAnswerQuestion();
 		}
 		else                                                                                // If there are no more questions, the round ends
 		{
