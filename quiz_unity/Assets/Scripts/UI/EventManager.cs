@@ -21,6 +21,8 @@ public class EventManager : MonoBehaviour
     private AnswerButton selectedAnswerButton;
     private Slider progressSlider;
 
+    public QuestionClock QuestionClock { get; set; }
+
     public void Awake()
     {
         wasTouched = false;
@@ -41,7 +43,7 @@ public class EventManager : MonoBehaviour
             {
                 resetSlider();
                 resetTouchClock();
-                selectedAnswerButton.GetComponent<AnswerButton>().HandleClick();
+                selectedAnswerButton.GetComponent<AnswerButton>().HandleClick(QuestionClock);
             }
             else
             {
@@ -72,8 +74,11 @@ public class EventManager : MonoBehaviour
     public void resetSlider()
     {
             wasTouched = false;
-            progressSlider.value = 0;
-            progressSlider.gameObject.SetActive(false);
+            if(progressSlider)
+            {
+                progressSlider.value = 0;
+                progressSlider.gameObject.SetActive(false);
+            }
     }
 
     public void LetAnswerQuestion()

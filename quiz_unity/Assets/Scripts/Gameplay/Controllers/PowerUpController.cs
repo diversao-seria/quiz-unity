@@ -25,6 +25,7 @@ public class PowerUpController : MonoBehaviour
     public int a1, a2;
     public int[] randomIndex;
     public AudioClip[] audioClips;
+    public Clock FreezeClock { get; set; }
 
     private AudioSource audioSource;
     private JsonController jsonController;
@@ -48,6 +49,7 @@ public class PowerUpController : MonoBehaviour
         jsonController = FindObjectOfType<JsonController>();
         bg = Background.GetComponent<Image>();
         bg.color = grey;
+        FreezeClock = new Clock(0.0f);
         RestoreAllPowerUps();
     }
 
@@ -73,30 +75,12 @@ public class PowerUpController : MonoBehaviour
         {
             if (leafImmunity)
             {
-                leafImmunity = false;
-                bg.color = grey;
+                LeafPowerExpired();
             }
             else
             {
                 rightAnswerCount = 0;
                 bg.color = grey;
-            }
-        }
-        if (timeFreeze)
-        {
-            timeFreeze = false;
-            bg.color = grey;
-        }
-
-        if (airPowerUp)
-        {
-            airPowerUp = false;
-            bg.color = grey;
-            for (int i = 0; i < answers.Length; i++)
-            {
-                answers[i].GetComponent<Image>().enabled = true;
-                answers[i].GetComponent<Button>().enabled = true;
-                answers[i].transform.GetChild(0).gameObject.SetActive(true);
             }
         }
     }
@@ -155,6 +139,35 @@ public class PowerUpController : MonoBehaviour
     {
         timeFreeze = true;
         jsonController.hab3++;
+    }
+
+    public void WaterPowerExpired() 
+    {
+        timeFreeze = false;
+        bg.color = grey;
+        FreezeClock.Reset();
+    }
+
+    public void AirPowerExpired()
+    {
+        airPowerUp = false;
+        bg.color = grey;
+
+        if (answers != null)
+        {
+            for (int i = 0; i < answers.Length; i++)
+            {
+                answers[i].GetComponent<Image>().enabled = true;
+                answers[i].GetComponent<Button>().enabled = true;
+                answers[i].transform.GetChild(0).gameObject.SetActive(true);
+            }
+        }
+    }
+
+    public void LeafPowerExpired()
+    {
+        leafImmunity = false;
+        bg.color = grey;
     }
 
     public void AirPowerUp()

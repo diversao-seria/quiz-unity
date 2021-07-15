@@ -33,7 +33,7 @@ public class GameController : MonoBehaviour
 	private List<Question> questionPool;  // Question are going here.
 
 	private bool isRoundActive = false;
-	private bool isQuestionAnswered = false;
+	public bool isQuestionAnswered = false;
 
 	private List<string> sequencia_atuacao = new List<string>();
 	private string source = "Q-0-1-H-0-0-0-AE-0-T-0-S-0";
@@ -46,6 +46,7 @@ public class GameController : MonoBehaviour
 
 	private QuestionClock questionClock;
 	private QuizClock quizClock;
+	private Clock freezeClock;
 
 	enum Clip : int
     {
@@ -73,7 +74,9 @@ public class GameController : MonoBehaviour
 		powerUpController = this.gameObject.GetComponent<PowerUpController>();
 
 		// questionClock = new QuestionClock(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
-		questionClock = new QuestionClock(30);
+		eventManager.QuestionClock = new QuestionClock(30);
+		questionClock = eventManager.QuestionClock;
+
 		quizClock = new QuizClock(0);
 
 		UpdateTimeRemainingDisplay(questionClock);
@@ -98,11 +101,21 @@ public class GameController : MonoBehaviour
 		if (isRoundActive && !isQuestionAnswered)
 		{
 			quizClock.IncreaseTime(Time.deltaTime);
+
 			if (!powerUpController.timeFreeze)
 				questionClock.DecreaseTime(Time.deltaTime);
+			else
+            {
+				powerUpController.FreezeClock.IncreaseTime(Time.deltaTime);
+				if(powerUpController.FreezeClock.Time >= 7)
+                {
+					powerUpController.WaterPowerExpired();
+                }
+            }
+
 			UpdateTimeRemainingDisplay(questionClock);
 
-			if (questionClock.Time <= 0f)                                                        // If timeRemaining is 0 or less, the round ends
+			if (questionClock.Time <= 0.0f)                                                        // If timeRemaining is 0 or less, the round ends
 			{
 				if (questionIndex == questionPool.Count - 1)
 				{
@@ -115,11 +128,30 @@ public class GameController : MonoBehaviour
 
 					if(eventManager.GetAnswerButton() && eventManager.TouchLastStatus())
                     {
-						eventManager.GetAnswerButton().HandleClick();
+
+						if (powerUpController.leafImmunity)
+                        {
+							eventManager.resetTouchClock();
+							eventManager.resetSlider();
+                        }
+						eventManager.GetAnswerButton().HandleClick(questionClock);
 					}
 					else
                     {
-						AnswerButtonClicked(false, -1);
+						if(powerUpController.leafImmunity)
+                        {
+							// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
+							StartCoroutine(WindVisualFeedback());
+							questionClock.NewCountdown(30);
+							eventManager.LetAnswerQuestion();
+							eventManager.ResetLastAnswerButton();
+							powerUpController.LeafPowerExpired();
+							isQuestionAnswered = false;
+						}
+						else
+                        {
+							AnswerButtonClicked(false, -1);
+						}
 					}
 				}
 			}
@@ -177,6 +209,9 @@ public class GameController : MonoBehaviour
 		eventManager.ResetLastAnswerButton();
 
 		powerUpController.AnswerCount(isCorrect);
+		powerUpController.WaterPowerExpired();
+		powerUpController.LeafPowerExpired();
+		powerUpController.AirPowerExpired();
 
 		if (isCorrect)
 		{
@@ -309,5 +344,13 @@ public class GameController : MonoBehaviour
 			EndRound();
 		}
 
+	}
+
+	public IEnumerator WindVisualFeedback()
+    {
+		feedbackImage.GetComponent<Image>().sprite = wrongAnswerIcon;
+		feedbackImage.gameObject.SetActive(true);
+		yield return new WaitForSeconds(2);
+		feedbackImage.gameObject.SetActive(false);
 	}
 }

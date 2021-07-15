@@ -11,6 +11,7 @@ public class AnswerButton : MonoBehaviour
 
 	private GameController gameController;
 	private EventManager eventManager;
+	private PowerUpController powerUpController;
 	private Color color;
 	private int alternativeNumber;
 
@@ -18,6 +19,7 @@ public class AnswerButton : MonoBehaviour
 	{
 		gameController = FindObjectOfType<GameController>();
 		eventManager = gameController.GetComponent<EventManager>();
+		powerUpController = gameController.GetComponent<PowerUpController>();
 
 		color = GetComponent<Image>().color;
 	}
@@ -34,9 +36,25 @@ public class AnswerButton : MonoBehaviour
 		this.alternativeNumber = alternativeNumber;
 	}
 
+
 	// AnswerClick
-	public void HandleClick()
+	public void HandleClick(QuestionClock questionClock)
 	{
-		gameController.AnswerButtonClicked(alternative.IsCorrect, alternativeNumber);
+
+		if (!eventManager.GetAnswerButton().alternative.IsCorrect && powerUpController.leafImmunity)
+		{
+			// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
+			StartCoroutine(gameController.WindVisualFeedback());
+			questionClock.NewCountdown(30);
+			eventManager.LetAnswerQuestion();
+			eventManager.ResetLastAnswerButton();
+			powerUpController.LeafPowerExpired();
+			gameController.isQuestionAnswered = false;
+		}
+		else
+        {
+			gameController.isQuestionAnswered = true;
+			gameController.AnswerButtonClicked(alternative.IsCorrect, alternativeNumber);
+		}
 	}
 }
