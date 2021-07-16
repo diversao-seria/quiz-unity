@@ -16,6 +16,13 @@ public class PreGameController : MonoBehaviour
     public Button m_startButton;
     public Text inputText;
     public string errorText = "Erro ao baixar o arquivo!";
+    private bool requestStatus = false;
+
+    public Text downloadProgess;
+    public GameObject spinner;
+    public GameObject fadeMask;
+
+    private UnityWebRequest www;
 
     void Awake()
     {
@@ -57,6 +64,7 @@ public class PreGameController : MonoBehaviour
     private void LoadQuiz(string quizCode)
     {
         // TO DO: make user wait
+        downloadProgess.text = "0";
         dataController.GetComponent<DataController>().PreLoadQuiz(quizCode);
         StartQuiz(quizCode);
     }
@@ -70,12 +78,18 @@ public class PreGameController : MonoBehaviour
     IEnumerator GetFile(string quizCode)
     {
         string url = "https://ds-quiz.herokuapp.com/quiz?code=" + quizCode;
-        using (UnityWebRequest www = UnityWebRequest.Get(url))
+
+        EnableLoadingUI();
+
+        using (www = UnityWebRequest.Get(url))
         {
+            requestStatus = true;
             yield return www.SendWebRequest();
             if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
             {
+                requestStatus = false;
                 errorText = "Erro ao baixar o arquivo.\n" + www.error.ToString();
+                DisableLoadingUI();
                 yield return null;
             }
             else
@@ -92,14 +106,57 @@ public class PreGameController : MonoBehaviour
             // Check if quiz's json is in correct place. 
             if (isQuizAvailable(quizCode))
             {
+                downloadProgess.text = "OK";
+                yield return new WaitForSeconds(1);
+                // DisableLoadingUI();
                 LoadQuiz(quizCode);
             }
             else
             {
+                DisableLoadingUI();
                 Debug.Log(errorText);
                 errorController.GetComponent<PopupHandler>().InitialExitBehaviour("error");               
             }
+            requestStatus = false;
         }
+    }
+
+    public UnityWebRequest GetRequestConnectionInstance()
+    {
+        return www;
+    }
+
+    public bool GetRequestStatus()
+    {
+        return requestStatus;
+    }
+
+    private void EnableLoadingUI()
+    {
+        spinner.transform.gameObject.SetActive(true);
+        spinner.transform.GetComponentInChildren<Transform>();
+        foreach (Transform spinnerPart in spinner.transform.GetComponentInChildren<Transform>())
+        {
+            Debug.Log("nome do objeto: " + spinnerPart.gameObject.name);
+            spinnerPart.gameObject.SetActive(true);
+        }
+
+        downloadProgess.gameObject.SetActive(true);
+        fadeMask.gameObject.SetActive(true);
+    }
+
+    private void DisableLoadingUI()
+    {
+        foreach (Transform spinnerPart in spinner.transform.GetComponentInChildren<Transform>())
+        {
+            Debug.Log("nome do objeto: " + spinnerPart.gameObject.name);
+            spinnerPart.gameObject.SetActive(false);
+        }
+        spinner.transform.gameObject.SetActive(false);
+
+
+        downloadProgess.gameObject.SetActive(false);
+        fadeMask.gameObject.SetActive(false);
     }
 
     void SetUpRoundData(string quizCode)
@@ -123,6 +180,7 @@ public class PreGameController : MonoBehaviour
 
         dataController.CurrentRoundData = roundData;
     }
+
 
     // db: unityTest
     // table: playerruns

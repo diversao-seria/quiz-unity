@@ -69,5 +69,4 @@ public class ExitHandler : MonoBehaviour
             ToggleObjectsFromParent(m_errorPopup.transform, false);
         }
     }
-
 }
