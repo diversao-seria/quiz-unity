@@ -26,4 +26,4 @@
 
 7.  Ao tocar em “Clássico”, o jogo exibirá uma mensagem pedindo autorização para utilizar o seu microfone, um requisito para a ferramenta de acessibilidade “text-to-speech”, que permite ao aplicativo ler o texto da tela em voz alta. Clique em “Permitir” e o jogo estará pronto para ser jogado.
 
-<img src="tutorial/image6.jpg" alt="quizle página inicial" width="200"/> <img src="tutorial/image7.jpg" alt="quizle permissão" width="300"/>
+<img src="tutorial/image6.jpg" alt="quizle página inicial" width="200"/> <img src="tutorial/image7.jpg" alt="quizle permissão" width="200"/>
