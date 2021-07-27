@@ -7,7 +7,7 @@
 
 ## Tutorial de instalação
 1.  Descompacte o arquivo “Quizle.zip” e clique no quizle.apk para realizar o download do jogo. Caso suceda, vá para o item 4.
-2.  Baixe o aplicativo no Android, clicando no link: [https://github.com/diversao-seria/quiz-unity/releases/tag/1.01](https://github.com/diversao-seria/quiz-unity/releases/tag/1.01)
+2.  Baixe o aplicativo no Android, clicando no link: [https://github.com/diversao-seria/quiz-unity/releases/tag/1.02](https://github.com/diversao-seria/quiz-unity/releases/tag/1.02)
 3.  No github, clique em “Assets” e depois em “Quizle.apk”, como mostram as figuras abaixo:
 
 <img src="tutorial/image1.jpg" alt="github quizle" width="200"/> <img src="tutorial/image2.jpg" alt="github quizle apk download" width="200"/>
