@@ -8,7 +8,7 @@ using System.IO;
 
 public class MenuScreenController : MonoBehaviour
 {
-    public Button m_classic, m_survival, m_competition, m_config;
+    public Button m_classic, m_survival, m_competition, m_config, m_credits;
 
     public Image m_profile, m_exit;
 
@@ -32,6 +32,8 @@ public class MenuScreenController : MonoBehaviour
         m_survival.onClick.AddListener(SurvivalBehaviour);
         m_competition.onClick.AddListener(CompetitionBehaviour);
         m_config.onClick.AddListener(ConfigurationBehaviour);
+        m_credits.onClick.AddListener(CreditsBehaviour);
+
         Load();
     }
 
@@ -75,6 +77,11 @@ public class MenuScreenController : MonoBehaviour
     {
         SpeechController.Instance.StartSpeaking(m_config.GetComponentInChildren<Text>().text);
         StartCoroutine(TransitionAnimation("ConfigScreen"));
+    }
+
+    void CreditsBehaviour()
+    {
+        StartCoroutine(TransitionAnimation("Credits"));
     }
 
     public void InitialExitBehaviour()
