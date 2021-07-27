@@ -27,17 +27,17 @@ public class ResultPool : MonoBehaviour
 
         if (questionAnswer.Result[i] == 'C')
         {
-            sLabelColor = Color.green;
+            sLabelColor = new Color(0.21f, 0.71f, 0.30f);
             gameObject.GetComponent<Image>().color = sLabelColor;
-            sBackgroundColor = new Color(0.8f, 1.0f, 0,8f);
+            sBackgroundColor = new Color(0.21f, 0.71f, 0.30f);
             
         }
         else if (questionAnswer.Result[i] == 'E')
         {
             Debug.Log("Definindo cores");
-            sLabelColor = Color.red;
+            sLabelColor = new Color(0.73f, 0.21f, 0.21f);
             gameObject.GetComponent<Image>().color = sLabelColor;
-            sBackgroundColor = new Color(1.0f, 0.8f, 1.0f);
+            sBackgroundColor = new Color(0.73f, 0.21f, 0.21f);
         }
         else
         {
@@ -54,6 +54,7 @@ public class ResultPool : MonoBehaviour
             "Explicação da resposta ainda está em desenvolvimento."
             );
 
-        gameObject.GetComponentInChildren<Text>().text = questionAnswer.Answer[i].ToString();
+        //gameObject.GetComponentInChildren<Text>().text = questionAnswer.Answer[i].ToString();
+        gameObject.GetComponentInChildren<Text>().text = (i+1).ToString();
     }
 }

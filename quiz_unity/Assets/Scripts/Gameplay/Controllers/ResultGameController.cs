@@ -78,7 +78,7 @@ public class ResultGameController : MonoBehaviour
                 break;
             case 2:
                 leftStar.GetComponent<Image>().sprite = litStar;
-                rightStar.GetComponent<Image>().sprite = litStar;
+                centralStar.GetComponent<Image>().sprite = litStar;
                 break;
             case 3:
                 leftStar.GetComponent<Image>().sprite = litStar;
