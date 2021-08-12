@@ -7,7 +7,7 @@ public class PowerUpButton : MonoBehaviour
     private GameObject gameController;
     private PowerUpController powerUpController;
 
-    public string powerUpName;
+    public GameMechanicsConstant.PowerUpNames powerUp;
 
     // Start is called before the first frame update
     void Start()
@@ -24,22 +24,7 @@ public class PowerUpButton : MonoBehaviour
 
     public void HandleClick()
     {
-        /*if (name == "Water")
-        {
-            powerUpController.WaterPowerUp();
-        }
-        else if (name == "Air")
-        {
-            powerUpController.AirPowerUp();
-        }
-        else if (name == "Earth")
-        {
-            powerUpController.EarthPowerUp();
-        }
-        powerUpController.RemovePowerUp(this.gameObject);*/
-
-        powerUpController.UsePowerUp(powerUpName);
+        powerUpController.UsePowerUp(powerUp);
         powerUpController.RemovePowerUp(this.gameObject);
-
     }
 }

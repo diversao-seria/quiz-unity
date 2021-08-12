@@ -36,13 +36,11 @@ public class GameController : MonoBehaviour
 	public bool isQuestionAnswered = false;
 
 	private List<string> sequencia_atuacao = new List<string>();
-	private string source = "Q-0-1-H-0-0-0-AE-0-T-0-S-0";
-	private int h1 = 0, h2 = 0, h3 = 0;
-	private int rightAnswers;
 	private int playerScore;
 	private int questionIndex;
 	private List<GameObject> answerButtonGameObjects = new List<GameObject>();
 	private int streak = 0;
+	private int numberOfCorrectAnswers = 0;
 
 	private QuestionClock questionClock;
 	private QuizClock quizClock;
@@ -57,7 +55,8 @@ public class GameController : MonoBehaviour
 
 	void Start()
 	{
-		jsonController = FindObjectOfType<JsonController>();
+		jsonController = new JsonController();
+		jsonController.SetNewQuizResultData();
 
 		dataController = FindObjectOfType<DataController>();        // Store a reference to the DataController so we can request the data we need for this round
 
@@ -65,13 +64,13 @@ public class GameController : MonoBehaviour
 		eventManager = GetComponent<EventManager>();
 
 
-		// powerUpController = FindObjectOfType<PowerUpController>();
-
 		currentRoundData = dataController.CurrentRoundData;                      // Ask the DataController for the data for the current round. At the moment, we only have one round - but we could extend this
 		questionPool = dataController.RetrieveQuiz().GetQuestionData().Questions;      // Take a copy of the questions so we could shuffle the pool or drop questions from it without affecting the original RoundData object
 		dataController.TrackQuestionsAnswers(questionPool.Count);
+		jsonController.SetTotalNumberOfQuestions(questionPool.Count);
 
 		powerUpController = this.gameObject.GetComponent<PowerUpController>();
+		powerUpController.SetJsonControllerReference(jsonController);
 
 		// questionClock = new QuestionClock(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
 		eventManager.QuestionClock = new QuestionClock(30);
@@ -82,7 +81,7 @@ public class GameController : MonoBehaviour
 		UpdateTimeRemainingDisplay(questionClock);
 		playerScore = 0;
 		questionIndex = 0;
-		rightAnswers = 0;
+		// rightAnswers = 0;
 
 		questionNumberTextController.GetComponent<QuestionNumberController>().SetMaxQuestions(questionPool.Count);
 
@@ -92,7 +91,8 @@ public class GameController : MonoBehaviour
 		ShowQuestion();
 		ShowQuestionNumber();
 
-		jsonController.startTime = System.DateTime.Now.ToString();		// records the current system time and date
+		jsonController.RegisterStartTime();	// records the current system time and date
+
 		isRoundActive = true;
 	}
 
@@ -196,6 +196,7 @@ public class GameController : MonoBehaviour
 
 	public void AnswerButtonClicked(bool isCorrect, int alternativeNumber)
 	{
+
 		dataController.GetQuestionAnswers().RegisterPlayerAnswer(
 				eventManager,
 				isCorrect,
@@ -203,6 +204,16 @@ public class GameController : MonoBehaviour
 				alternativeNumber,
 				questionClock.Time
 			);
+
+		jsonController.AddNewAnsweredQuestion(
+				questionIndex,
+				alternativeNumber,
+				isCorrect,
+				(int)(30 - questionClock.Time)
+			);
+
+
+		jsonController.UpdateTotalTime((int)(30 - questionClock.Time));
 
 		eventManager.resetTouchClock();
 		eventManager.resetSlider();
@@ -215,54 +226,34 @@ public class GameController : MonoBehaviour
 
 		if (isCorrect)
 		{
+			jsonController.UpdateScore(playerScore);
+			jsonController.UpdateNumberOfCorrectQuestions();
 			playerScore += currentRoundData.CurrentPoints;                    // If the AnswerButton that was clicked was the correct answer, add points
 			scoreDisplay.text = playerScore.ToString();
-			jsonController.rightAnswers++;
 			streak++;
 			// Add correct feedback audio
 			audioSource.PlayOneShot(audioClips[(int)Clip.correct]);
 		}
 		else
 		{
-			jsonController.wrongAnswers++;
 			// Add wrong feedback audio
 			audioSource.PlayOneShot(audioClips[(int)Clip.wrong]);
 		}
 
+		/*
 		if (streak > jsonController.streak)
 		{
 			jsonController.streak = streak;
 		}
-		string[] parts = source.Split('-');													// Separates the source string, which will be used to create "sequencia_atuacao"
-		parts[1] = (questionIndex + 1).ToString().PadLeft(2, '0');
-		parts[8] = (alternativeNumber + 1).ToString();										
-		parts[10] = System.Math.Round(25 - questionClock.Time).ToString().PadLeft(3, '0');	// This edits each part of the string
-		parts[12] = System.Convert.ToByte(isCorrect).ToString();
-		string hab = "";
-		if (jsonController.hab1 != h1)                                                      // Checks if any power ups have been used during this round
-		{
-			h1 = jsonController.hab1;
-			hab = "1";
-			parts[5] = powerUpController.randomIndex[0].ToString();
-			parts[6] = powerUpController.randomIndex[1].ToString();
-		}
-		else if (jsonController.hab2 != h2)
-		{
-			h2 = jsonController.hab2;
-			hab = "2";
-		}
-		else if (jsonController.hab3 != h3)
-		{
-			h3 = jsonController.hab3;
-			hab = "3";
-		}
-		else
-		{
-			hab = "0";
-		}
-		parts[4] = hab;
+		*/
 
-		sequencia_atuacao.Add(string.Join("", parts));										// This puts every part of the separated source string together, creating a new string which will be saved in the .json file.
+
+		// sequencia_atuacao.Add(string.Join("", parts));     // This puts every part of the separated source string together, creating a new string which will be saved in the .json file.
+
+		// TO DO: Save Partial Answers around here. How?
+		// Finished Answering. Register and Reset.
+
+
 
 		StartCoroutine(VisualFeedback(isCorrect));
 	}
@@ -283,6 +274,7 @@ public class GameController : MonoBehaviour
 		roundEndDisplay.SetActive(true);
 
 		string folderPath = currentRoundData.FolderPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerQuizDataFile;
+		jsonController.DEBUGPlayerJSONData();
 
 		// Creating file with quiz results
 		if (File.Exists(folderPath))
@@ -290,11 +282,11 @@ public class GameController : MonoBehaviour
 			// Making sure there's only one file at one point in time
 			File.Delete(folderPath); 
 		}
-		jsonController.score = playerScore;
-		jsonController.sequencia_atuacao = sequencia_atuacao;
 
-		dataController.WriteOnPath(currentRoundData.FolderPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerQuizDataFile,
-			jsonController.SaveToString());
+		jsonController.UpdateScore(playerScore);
+		dataController.WriteOnPath(currentRoundData.FolderPath + 
+								   Path.AltDirectorySeparatorChar + 
+									DataManagementConstant.PlayerQuizDataFile, jsonController.SerializeAnswerData());
 
 
 		// StreamWriter writer = File.CreateText(Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerDataPath);
@@ -315,7 +307,7 @@ public class GameController : MonoBehaviour
 		if (isCorrect)
 		{
 			feedbackImage.GetComponent<Image>().sprite = correctAnswerIcon;
-			rightAnswers++;
+			// rightAnswers++;
 		}
 		else
 		{
@@ -341,6 +333,7 @@ public class GameController : MonoBehaviour
 		}
 		else                                                                                // If there are no more questions, the round ends
 		{
+
 			EndRound();
 		}
 
