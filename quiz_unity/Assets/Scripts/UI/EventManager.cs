@@ -21,6 +21,9 @@ public class EventManager : MonoBehaviour
     private AnswerButton selectedAnswerButton;
     private Slider progressSlider;
 
+    private AudioSource audioSource;
+    public AudioClip touchingClip;
+
     public QuestionClock QuestionClock { get; set; }
 
     public void Awake()
@@ -28,6 +31,8 @@ public class EventManager : MonoBehaviour
         wasTouched = false;
         LetAnswerQuestion();
         holdTouchClock = new PressClock(0);
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     public void Update()
@@ -37,10 +42,13 @@ public class EventManager : MonoBehaviour
             Touch touch = Input.GetTouch(0);
             holdTouchClock.IncreaseTime(Time.deltaTime);
 
+            if(!audioSource.isPlaying) audioSource.PlayOneShot(touchingClip);
+
             progressSlider.value = Math.Min(holdTouchClock.Time / answerConfirmation, 1);
 
             if(holdTouchClock.Time >= answerConfirmation)
             {
+                
                 resetSlider();
                 resetTouchClock();
                 selectedAnswerButton.GetComponent<AnswerButton>().HandleClick(QuestionClock);
@@ -73,12 +81,13 @@ public class EventManager : MonoBehaviour
 
     public void resetSlider()
     {
-            wasTouched = false;
-            if(progressSlider)
-            {
-                progressSlider.value = 0;
-                progressSlider.gameObject.SetActive(false);
-            }
+        audioSource.Stop();
+        wasTouched = false;
+        if(progressSlider)
+        {
+            progressSlider.value = 0;
+            progressSlider.gameObject.SetActive(false);
+        }
     }
 
     public void LetAnswerQuestion()
