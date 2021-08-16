@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class TutorialController : MonoBehaviour
 {
-    public GameObject balloon1, balloon2, balloon3, balloon4, balloon5, balloon6, nextButton, previousButton;
+    public GameObject balloon1, balloon2, balloon3, balloon4, balloon5, balloon6, nextButton, previousButton, skipButton;
     public Sprite b1, b2, b3, leaf, wind, ice;
 
     public Transform timer, answerButtonParent, question, exit, questionNumber;
@@ -48,10 +48,6 @@ public class TutorialController : MonoBehaviour
         {
             currentState++;
             tutorial[currentState]();
-        }
-        else if (currentState == tutorial.Count - 1)
-        {
-            StartGame();
         }
     }
 
@@ -228,6 +224,8 @@ public class TutorialController : MonoBehaviour
         balloon6.SetActive(false);
 
         balloon1.SetActive(true);
+        nextButton.SetActive(true);
+        skipButton.transform.GetChild(0).GetComponent<Text>().text = "Pular Tutorial";
 
         Text text = balloon1.GetComponentInChildren<Text>();
         text.text = "Se você fizer uma sequência correta de três acertos, os poderes usados serão restaurados.";
@@ -236,6 +234,9 @@ public class TutorialController : MonoBehaviour
     private void B12()
     {
         //Estado 12 - Final
+        nextButton.SetActive(false);
+        skipButton.transform.GetChild(0).GetComponent<Text>().text = "Começar";
+
         balloon1.SetActive(true);
 
         Text text = balloon1.GetComponentInChildren<Text>();
