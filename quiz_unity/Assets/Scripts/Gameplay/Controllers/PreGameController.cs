@@ -72,7 +72,17 @@ public class PreGameController : MonoBehaviour
     private void StartQuiz(string quizCode)
     {
         SetUpRoundData(quizCode);
-        SceneManager.LoadScene("Game");
+        
+        //If it's the first time opening the game, run tutorial
+        if (PlayerPrefs.GetInt("SkipTutorial") != 1)
+        {
+            PlayerPrefs.SetInt("SkipTutorial", 1);
+            SceneManager.LoadScene("Tutorial");
+        }
+        else
+        {
+            SceneManager.LoadScene("Game");
+        }
     }
 
     IEnumerator GetFile(string quizCode)

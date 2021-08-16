@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class TutorialController : MonoBehaviour
 {
@@ -34,7 +35,6 @@ public class TutorialController : MonoBehaviour
         tutorial.Add(B10);
         tutorial.Add(B11);
         tutorial.Add(B12);
-        tutorial.Add(B13);
 
         //Inicia o tutorial
         tutorial[0]();
@@ -48,6 +48,10 @@ public class TutorialController : MonoBehaviour
         {
             currentState++;
             tutorial[currentState]();
+        }
+        else if (currentState == tutorial.Count - 1)
+        {
+            StartGame();
         }
     }
 
@@ -81,16 +85,18 @@ public class TutorialController : MonoBehaviour
 
         //Altera o texto
         Text text = balloon1.GetComponentInChildren<Text>();
-        text.text = "Olá, vamos iniciar o tutorial.\nVocê pode pular ele a qualquer momento, caso deseje...\nClique nas setas para prosseguir.";
+        text.text = "Bem-Vindo ao Quizle! Clique nas setas para aprender como se joga.";
     }
+
 
     private void B2()
     {
-        //Estado 2 - Timer 1
+        //Estado 2 - Timer 
         
         //Desfaz as ativações do anterior e próximo estado
         balloon1.SetActive(false);
         balloon3.SetActive(false);
+        questionNumber.SetParent(PanelSafeArea, true);
 
         //Habilita o balão a ser utilizado, o botão de voltar e dá destaque ao timer
         balloon2.SetActive(true);
@@ -102,71 +108,47 @@ public class TutorialController : MonoBehaviour
 
         //Altera o texto
         Text text = balloon2.GetComponentInChildren<Text>();
-        text.text = "Aqui você pode consultar o tempo restante para responder a questão.";
+        text.text = "O tempo restante para responder a questão aparece aqui.";
     }
 
     private void B3()
     {
-        //Estado 3 - Timer 2
+        //Estado 3 - Questões
 
-        //Desfaz o próximo estado
-        questionNumber.SetParent(PanelSafeArea, true);
+        //Desfaz o próximo estado e o anterior
+        timer.SetParent(PanelSafeArea, true);
+        exit.SetParent(PanelSafeArea, true);
 
         //Habilita os objetos
-        timer.SetParent(PanelBlurr, true);
+        questionNumber.SetParent(PanelBlurr, true);
 
         //Muda a sprite
-        balloon2.GetComponent<Image>().sprite = b1;
+        balloon2.GetComponent<Image>().sprite = b3;
 
         //Altera o texto
         Text text = balloon2.GetComponentInChildren<Text>();
-        text.text = "O tempo não contribuí para a sua pontuação final! Ou seja, responder uma questão mais rápido não aumentará a sua pontuação.";
+        text.text = "O número da questão e o total aparecem aqui.";
     }
 
     private void B4()
     {
-        //Estado 4 - Questões
-        timer.SetParent(PanelSafeArea, true);
-        questionNumber.SetParent(PanelBlurr, true);
+        //Estado 4 - Saída
+        questionNumber.SetParent(PanelSafeArea, true);
+        question.SetParent(PanelSafeArea, true);
 
-        exit.SetParent(PanelSafeArea, true);
+        exit.SetParent(PanelBlurr, true);
 
-        balloon2.GetComponent<Image>().sprite = b3;
+        balloon4.SetActive(false);
+        balloon2.SetActive(true);
+        balloon2.GetComponent<Image>().sprite = b2;
 
-        Text text = balloon2.GetComponentInChildren<Text>(); 
-        text.text = "Aqui você pode consultar a quantidade de questões que o quiz possuí e qual delas você está respondendo no momento.";
+        Text text = balloon2.GetComponentInChildren<Text>();
+        text.text = "Clique aqui para finalizar o quiz e retornar ao menu principal do jogo.";
     }
 
     private void B5()
     {
-        //Estado 5 - Saída 1
-        questionNumber.SetParent(PanelSafeArea, true);
-
-        exit.SetParent(PanelBlurr, true);
-
-        balloon2.GetComponent<Image>().sprite = b2;
-
-        Text text = balloon2.GetComponentInChildren<Text>();
-        text.text = "Você pode clicar aqui a qualquer momento para sair do quiz.";
-    }
-
-    private void B6()    {
-        //Estado 6 - Saída 2
-        question.SetParent(PanelSafeArea, true);        
-        balloon4.SetActive(false);
-
-        balloon2.SetActive(true);
-        exit.SetParent(PanelBlurr, true);
-
-        balloon2.GetComponent<Image>().sprite = b2;
-
-        Text text = balloon2.GetComponentInChildren<Text>();
-        text.text = "Vale lembrar que as questões respondidas serão salvas e registradas na sua pontuação final ainda assim.";
-    }
-
-    private void B7()
-    {
-        //Estado 7 - Questão
+        //Estado 5 - Questão
         exit.SetParent(PanelSafeArea, true);
         answerButtonParent.SetParent(PanelSafeArea, true);
 
@@ -179,9 +161,8 @@ public class TutorialController : MonoBehaviour
         balloon4.SetActive(true);
     }
 
-    private void B8()
-    {
-        //Estado 8 - Alternativas
+    private void B6()    {
+        //Estado 6 - Alternativas
         question.SetParent(PanelSafeArea, true);
 
         answerButtonParent.SetParent(PanelBlurr, true);
@@ -193,11 +174,11 @@ public class TutorialController : MonoBehaviour
         balloon5.SetActive(true);
     }
 
-    private void B9()
+    private void B7()
     {
-        //Estado 9 - Poderes Geral
+        //Estado 7 - Poderes Geral
         answerButtonParent.SetParent(PanelSafeArea, true);
-       
+
         balloon5.SetActive(false);
         balloon6.SetActive(false);
 
@@ -205,51 +186,65 @@ public class TutorialController : MonoBehaviour
         balloon3.SetActive(true);
     }
 
-    private void B10()
+    private void B8()
     {
-        //Estado 10 - Poderes Vento
+        //Estado 8 - Poderes Vento
         balloon3.SetActive(false);
 
         balloon6.SetActive(true);
 
         //Muda a sprite e o texto do balão 6
-        balloon6.GetComponentInChildren<Image>().sprite = wind;
+        balloon6.transform.GetChild(1).GetComponent<Image>().sprite = wind;
         Text text = balloon6.GetComponentInChildren<Text>();
-        text.text = "Ao usar este poder, duas alternativas incorretas são eliminadas.";
+        text.text = "Eliminar duas alternativas incorretas.";
     }
 
-    private void B11()
+    private void B9()
     {
-        //Estado 11 - Poderes Folha
+        //Estado 9 - Poderes Folha
         balloon6.SetActive(true);
 
         //Muda a sprite e o texto do balão 6
-        balloon6.GetComponentInChildren<Image>().sprite = leaf;
+        balloon6.transform.GetChild(1).GetComponent<Image>().sprite = leaf;
         Text text = balloon6.GetComponentInChildren<Text>();
-        text.text = "Usando esse poder você ganha uma segunda chance caso erre a alternativa nesta questão";
+        text.text = "Responder novamente caso erre. Lembre-se: este poder deve ser ativado antes de responder a questão.";
     }
 
-    private void B12()
+    private void B10()
     {
-        //Estado 12 - Poderes Gelo
+        //Estado 10 - Poderes Gelo
         balloon6.SetActive(true);
+        balloon1.SetActive(false);
 
         //Muda a sprite e o texto do balão 6
-        balloon6.GetComponentInChildren<Image>().sprite = ice;
+        balloon6.transform.GetChild(1).GetComponent<Image>().sprite = ice;
         Text text = balloon6.GetComponentInChildren<Text>();
         text.text = "Após usar esse poder, o tempo da questão irá congelar por alguns segundos.";
     }
 
-    private void B13()
+    private void B11()
     {
-        //Estado 13 - Final
+        //Estado 11 - Poder fogo
         balloon6.SetActive(false);
 
         balloon1.SetActive(true);
 
         Text text = balloon1.GetComponentInChildren<Text>();
-        text.text = "Finalmente, terminamos o tutorial."; 
-        //"Prossiga para uma partida de teste"?
+        text.text = "Se você fizer uma sequência correta de três acertos, os poderes usados serão restaurados.";
+    }
+
+    private void B12()
+    {
+        //Estado 12 - Final
+        balloon1.SetActive(true);
+
+        Text text = balloon1.GetComponentInChildren<Text>();
+        text.text = "Está preparado? Prossiga nessa aventura do conhecimento. Bom jogo!";
+    }
+
+    public void StartGame()
+    {
+        SceneManager.LoadScene("Game");
     }
 
 }
