@@ -7,9 +7,10 @@ using UnityEngine.UI;
 [System.Serializable]
 public class PowerUps
 {
-    public string name;
+    public GameMechanicsConstant.PowerUpNames name;
     public Sprite icon;
     public Color color;
+
 }
 public class PowerUpController : MonoBehaviour
 {
@@ -46,7 +47,6 @@ public class PowerUpController : MonoBehaviour
     void Start()
     {
         audioSource = gameObject.GetComponent<AudioSource>();
-        jsonController = FindObjectOfType<JsonController>();
         bg = Background.GetComponent<Image>();
         bg.color = grey;
         FreezeClock = new Clock(0.0f);
@@ -91,6 +91,8 @@ public class PowerUpController : MonoBehaviour
 
         for (int i = 0; i < powerUps.Count; i++)
         {
+
+            // PowerUps pw = new PowerUps(GameMechanicsConstant.PowerUpNames[i],,
             RestorePowerUp(powerUps[i]);
         }
     }
@@ -113,8 +115,8 @@ public class PowerUpController : MonoBehaviour
 
         PowerUpButton powerUpButton = powerUpGameObject.GetComponent<PowerUpButton>();
         button.onClick.AddListener(delegate { powerUpButton.HandleClick(); });
-        powerUpButton.powerUpName = pw.name;
-        //powerUpGameObject.GetComponentInChildren<Image>().color = pw.color;
+        powerUpButton.powerUp = pw.name;
+        // powerUpGameObject.GetComponentInChildren<Image>().color = pw.color;
         powerUpGameObject.GetComponentInChildren<Image>().sprite = pw.icon;
 
     }
@@ -124,7 +126,7 @@ public class PowerUpController : MonoBehaviour
         int powerUpIndex = -1;
         for (int i = 0; i < powerUpGameObjects.Count; i++)
         {
-            if (pw.GetComponent<PowerUpButton>().powerUpName == powerUpGameObjects[i].GetComponent<PowerUpButton>().powerUpName)
+            if (pw.GetComponent<PowerUpButton>().powerUp == powerUpGameObjects[i].GetComponent<PowerUpButton>().powerUp)
             {
                 powerUpIndex = i;
             }
@@ -138,7 +140,7 @@ public class PowerUpController : MonoBehaviour
     public void WaterPowerUp()
     {
         timeFreeze = true;
-        jsonController.hab3++;
+        jsonController.UsedPowerUp(GameMechanicsConstant.PowerUpNames.Water);
     }
 
     public void WaterPowerExpired() 
@@ -146,28 +148,6 @@ public class PowerUpController : MonoBehaviour
         timeFreeze = false;
         bg.color = grey;
         FreezeClock.Reset();
-    }
-
-    public void AirPowerExpired()
-    {
-        airPowerUp = false;
-        bg.color = grey;
-
-        if (answers != null)
-        {
-            for (int i = 0; i < answers.Length; i++)
-            {
-                answers[i].GetComponent<Image>().enabled = true;
-                answers[i].GetComponent<Button>().enabled = true;
-                answers[i].transform.GetChild(0).gameObject.SetActive(true);
-            }
-        }
-    }
-
-    public void LeafPowerExpired()
-    {
-        leafImmunity = false;
-        bg.color = grey;
     }
 
     public void AirPowerUp()
@@ -197,13 +177,35 @@ public class PowerUpController : MonoBehaviour
             answers[indexArray[randomIndex[i]]].transform.GetChild(0).gameObject.SetActive(false);
         }
 
-        jsonController.hab1++;
+        jsonController.UsedPowerUp(GameMechanicsConstant.PowerUpNames.Air);
+    }
+
+    public void AirPowerExpired()
+    {
+        airPowerUp = false;
+        bg.color = grey;
+
+        if (answers != null)
+        {
+            for (int i = 0; i < answers.Length; i++)
+            {
+                answers[i].GetComponent<Image>().enabled = true;
+                answers[i].GetComponent<Button>().enabled = true;
+                answers[i].transform.GetChild(0).gameObject.SetActive(true);
+            }
+        }
     }
 
     public void EarthPowerUp()
     {
         leafImmunity = true;
-        jsonController.hab2++;
+        jsonController.UsedPowerUp(GameMechanicsConstant.PowerUpNames.Earth);
+    }
+
+    public void LeafPowerExpired()
+    {
+        leafImmunity = false;
+        bg.color = grey;
     }
 
     private int[] ReturnRandomIndexes(int[] indexes, int n)
@@ -232,7 +234,7 @@ public class PowerUpController : MonoBehaviour
 
 
 
-    public void UsePowerUp(string name)
+    public void UsePowerUp(GameMechanicsConstant.PowerUpNames name)
     {
         PowerUps pw = new PowerUps();
         for (int i = 0; i < powerUps.Count; i++)
@@ -245,20 +247,25 @@ public class PowerUpController : MonoBehaviour
 
         bg.color = pw.color;
 
-        if (pw.name == "Water")
+        if (pw.name == GameMechanicsConstant.PowerUpNames.Water)
         {
             WaterPowerUp();
             audioSource.PlayOneShot(audioClips[(int)Clip.water]);
         }
-        else if (pw.name == "Air")
+        else if (pw.name == GameMechanicsConstant.PowerUpNames.Air)
         {
             AirPowerUp();
             audioSource.PlayOneShot(audioClips[(int)Clip.air]);
         }
-        else if (pw.name == "Earth")
+        else if (pw.name == GameMechanicsConstant.PowerUpNames.Earth)
         {
             EarthPowerUp();
             audioSource.PlayOneShot(audioClips[(int)Clip.earth]);
         }
+    }
+
+    public void SetJsonControllerReference(JsonController jsonController)
+    {
+        this.jsonController = jsonController;
     }
 }
