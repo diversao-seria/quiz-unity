@@ -8,6 +8,10 @@ public class ResultPool : MonoBehaviour
     public GameObject resultPrefab;
     public Transform parentObject;
 
+    public Sprite correctImage;
+    public Sprite wrongImage;
+    public Sprite timesUpImage;
+
     public void InstantiateResults(List<Question> questions, QuestionAnswer questionAnswer, Transform transform)
     {
         for (int i = 0; i < questionAnswer.Answer.Length; i++)
@@ -27,23 +31,26 @@ public class ResultPool : MonoBehaviour
 
         if (questionAnswer.Result[i] == 'C')
         {
-            sLabelColor = new Color(0.21f, 0.71f, 0.30f);
-            gameObject.GetComponent<Image>().color = sLabelColor;
-            sBackgroundColor = new Color(0.21f, 0.71f, 0.30f);
+            sLabelColor = new Color(0.06f, 0.56f, 0.23f);
+            //gameObject.GetComponent<Image>().color = sLabelColor;
+            sBackgroundColor = new Color(0.93f, 0.99f, 0.78f);
+            gameObject.GetComponent<Image>().sprite = correctImage;
             
         }
         else if (questionAnswer.Result[i] == 'E')
         {
-            Debug.Log("Definindo cores");
-            sLabelColor = new Color(0.73f, 0.21f, 0.21f);
-            gameObject.GetComponent<Image>().color = sLabelColor;
-            sBackgroundColor = new Color(0.73f, 0.21f, 0.21f);
+            //Debug.Log("Definindo cores");
+            sLabelColor = new Color(0.89f, 0.18f, 0.14f);
+            //gameObject.GetComponent<Image>().color = sLabelColor;
+            sBackgroundColor = new Color(0.98f, 0.86f, 0.83f);
+            gameObject.GetComponent<Image>().sprite = wrongImage;
         }
         else
         {
-            sLabelColor = Color.gray;
-            gameObject.GetComponent<Image>().color = sLabelColor;
-            sBackgroundColor = new Color(0.9f, 0.9f, 0.9f);
+            sLabelColor = new Color(0.41f, 0.52f, 0.57f);
+            //gameObject.GetComponent<Image>().color = sLabelColor;
+            sBackgroundColor = new Color(0.89f, 0.96f, 0.96f);
+            gameObject.GetComponent<Image>().sprite = timesUpImage;
         }
 
         gameObject.GetComponent<AnswerFeedbackButton>().AnswerFeedbackData = new AnswerFeedbackData(
