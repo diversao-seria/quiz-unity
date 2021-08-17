@@ -48,7 +48,7 @@ public class PowerUpController : MonoBehaviour
     {
         audioSource = gameObject.GetComponent<AudioSource>();
         bg = Background.GetComponent<Image>();
-        bg.color = grey;
+        //bg.color = grey;
         FreezeClock = new Clock(0.0f);
         RestoreAllPowerUps();
     }

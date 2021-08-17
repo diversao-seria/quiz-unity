@@ -13,7 +13,7 @@ public class PanelSafeArea : MonoBehaviour
     //ScreenOrientation currentOrientation = ScreenOrientation.AutoRotation;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         panelSafeArea = GetComponent<RectTransform>();
 
