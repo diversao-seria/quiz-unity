@@ -65,9 +65,10 @@ public class GameController : MonoBehaviour
 
 
 		currentRoundData = dataController.CurrentRoundData;                      // Ask the DataController for the data for the current round. At the moment, we only have one round - but we could extend this
-		questionPool = dataController.RetrieveQuiz().GetQuestionData().Questions;      // Take a copy of the questions so we could shuffle the pool or drop questions from it without affecting the original RoundData object
+		questionPool = dataController.RetrieveQuiz().Questions;      // Take a copy of the questions so we could shuffle the pool or drop questions from it without affecting the original RoundData object
 		dataController.TrackQuestionsAnswers(questionPool.Count);
 		jsonController.SetTotalNumberOfQuestions(questionPool.Count);
+		jsonController.SetQuizID(dataController.RetrieveQuiz().Id);
 
 		powerUpController = this.gameObject.GetComponent<PowerUpController>();
 		powerUpController.SetJsonControllerReference(jsonController);
@@ -162,7 +163,8 @@ public class GameController : MonoBehaviour
 	{
 		RemoveAnswerButtons();
 
-		Question question = questionPool[questionIndex];                                     // Get the QuestionData for the current question																								 // Update questionText with the correct tex
+		Question question = questionPool[questionIndex];                                     // Get the QuestionData for the current question
+
 		questionText.text = question.Text;
 
 		for (int i = 0; i < question.Alternatives.Count; i++)                               // For every AnswerData in the current QuestionData...
@@ -196,7 +198,7 @@ public class GameController : MonoBehaviour
 
 	public void AnswerButtonClicked(bool isCorrect, int alternativeNumber)
 	{
-
+		// To be shown to player later 
 		dataController.GetQuestionAnswers().RegisterPlayerAnswer(
 				eventManager,
 				isCorrect,
@@ -205,8 +207,9 @@ public class GameController : MonoBehaviour
 				questionClock.Time
 			);
 
+		// For data collection
 		jsonController.AddNewAnsweredQuestion(
-				questionIndex,
+				dataController.RetrieveQuiz().Questions[questionIndex].ID,
 				alternativeNumber,
 				isCorrect,
 				(int)(30 - questionClock.Time)
@@ -294,6 +297,7 @@ public class GameController : MonoBehaviour
 		// writer.Close();
 
 		Debug.Log("Total time: " + quizClock.HHmmss());
+
 		SceneManager.LoadScene("QuizResult");
 	}
 

@@ -196,19 +196,21 @@ public class PreGameController : MonoBehaviour
     // table: playerruns
     // ID (P)(int), TemponoQuiz (string - varchar), RespostasCorretas (int)
 
-    /* 
-    IEnumerator SendForm()
+    IEnumerator SendForm(string jsonData)
     {
 
-        int exampleID = 111;
-        string exampleTime = "00:00:30";
-        int exampleCorrect = 5;
+        string url = "http://ds-quiz.herokuapp.com/matches";
 
-        List<IMultipartFormSection> formData = new List<IMultipartFormSection>();
+        // List<IMultipartFormSection> formData = new List<IMultipartFormSection>();
         // formData.Add(new MultipartFormDataSection("ID=" + exampleID.ToString() + "&" + "TemponoQuiz=" + exampleTime + "&" + "RespostasCorretas=" + exampleCorrect.ToString()));
-        formData.Add(new MultipartFormFileSection("my file data", "myfile.txt"));
+        // formData.Add(new MultipartFormFileSection("my file data", pathToMatchData));
 
-        UnityWebRequest www = UnityWebRequest.Post("http://www.my-server.com/myform", formData);
+        UnityWebRequest www = UnityWebRequest.Post(url, "POST");
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
+        www.SetRequestHeader("Content-Type", "application/json");
+        yield return www.SendWebRequest();
+        Debug.Log("Status Code: " + www.responseCode);
+
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
@@ -222,5 +224,4 @@ public class PreGameController : MonoBehaviour
 
         
     }
-    */
 }

@@ -1,7 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
+using System.IO;
 
 public class ResultGameController : MonoBehaviour
 {
@@ -47,6 +50,7 @@ public class ResultGameController : MonoBehaviour
     void Start()
     {
         ShowPlayerAnswers();
+        SendPlayerData(dataController.QuizCode);
     }
 
     // Update is called once per frame
@@ -115,7 +119,7 @@ public class ResultGameController : MonoBehaviour
     void generateAnswers()
     {
         resultPool.GetComponent<ResultPool>().InstantiateResults(
-            dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().Questions
+            dataController.GetComponent<DataController>().RetrieveQuiz().Questions
             , questionAnswer, 
             lowerWrapper.transform);
 
@@ -162,6 +166,54 @@ public class ResultGameController : MonoBehaviour
         foreach(Transform child in transform)
         {
             ToggleObject(child,flag);
+        }
+    }
+
+    public void SendPlayerData(string quizCode)
+    {
+        StartCoroutine(SendForm(quizCode));
+    }
+
+    IEnumerator SendForm(string quizCode)
+    {
+
+        string url = "http://ds-quiz.herokuapp.com/matches";
+
+        // List<IMultipartFormSection> formData = new List<IMultipartFormSection>();
+        // formData.Add(new MultipartFormDataSection("ID=" + exampleID.ToString() + "&" + "TemponoQuiz=" + exampleTime + "&" + "RespostasCorretas=" + exampleCorrect.ToString()));
+        // formData.Add(new MultipartFormFileSection("my file data", pathToMatchData));
+
+        string pathToQuizResult = Path.Combine(Application.persistentDataPath + Path.AltDirectorySeparatorChar +
+            DataManagementConstant.PlayerDataPath + quizCode + Path.AltDirectorySeparatorChar + "QuizAnswerData" + ".json");
+
+        string jsonData = null;
+
+        try 
+        {
+            jsonData = System.IO.File.ReadAllText(pathToQuizResult);
+        }
+        catch(IOException e)
+        {
+            Debug.Log(e);
+        }
+
+        using (UnityWebRequest www = UnityWebRequest.Post(url, "POST"))
+        {
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
+            www.SetRequestHeader("Content-Type", "application/json");
+            www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
+            yield return www.SendWebRequest();
+            Debug.Log("Status Code: " + www.responseCode);
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log(www.error);
+                Debug.Log(www.downloadHandler.text);
+            }
+            else
+            {
+                Debug.Log("Form upload complete!");
+            }
         }
     }
 }

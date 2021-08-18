@@ -65,6 +65,11 @@ public class JsonController : MonoBehaviour
         sessionResult.TotalQuestions = totalQuestions;
     }
 
+    public void SetQuizID(int id)
+    {
+        quizResultData.QuizID = id;
+    }
+
     public void RegisterStartTime()
     {
         quizResultData.StartTime = System.DateTime.Now.ToString();
