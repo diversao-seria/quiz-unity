@@ -6,15 +6,9 @@ public class QuestionData
     [JsonProperty("id")]
     public int ID { get; set; }
 
-    [JsonProperty("code")]
-    public string Code { get; set; }
-
     [JsonProperty("title")]
-    public string Title { get; set; }
+    public string Text { get; set; }
 
-    [JsonProperty("QuestionTime")]
-    public float QuestionTime { get; set; }
-
-    [JsonProperty("questions")]
-    public List<Question> Questions { get; set; }
+    [JsonProperty("alternatives")]
+    public List<Alternative> Alternatives { get; set; }
 }

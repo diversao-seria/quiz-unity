@@ -12,6 +12,8 @@ public class DataController : MonoBehaviour
 {
 	public RoundData CurrentRoundData { get; set; }
 
+	public string QuizCode { get; set; }
+
 	private PlayerProgress playerProgress;
 	private string gameDataFileName = "data.json";
 	private Quiz currentQuiz;
@@ -140,19 +142,18 @@ public class DataController : MonoBehaviour
 	// Populate all relevant classes with the JSON provided.
 	public void PreLoadQuiz(string quizCode)
     {
+		QuizCode = quizCode;
 		filenameJSON = quizCode + ".json";
 
-		QuestionData questionData = new QuestionData();
-
-		questionData = getContentFromFile(quizCode);
-		Debug.Log("QuestionTime: " + questionData.QuestionTime);
-		currentQuiz = new Quiz(questionData, quizCode);
+		currentQuiz = getContentFromFile(QuizCode);
+		Debug.Log("QUIZ_ID: " + currentQuiz.Id);
+		// Debug.Log("QuestionTime: " + questionData.QuestionTime);
 	}
 
-	private QuestionData getContentFromFile(string quizCode)
+	private Quiz getContentFromFile(string quizCode)
 	{
 		string jsonData = readFromJson(quizCode);
-		return JsonConvert.DeserializeObject<QuestionData>(jsonData);
+		return JsonConvert.DeserializeObject<Quiz>(jsonData);
 	}
 
 	private string readFromJson(string quizCode)
