@@ -39,7 +39,7 @@ public class SpeechController : MonoBehaviour
         TextToSpeech.Instance.onStartCallBack = OnSpeakStart;
         TextToSpeech.Instance.onDoneCallback = OnSpeakStop;
 
-        CheckPermission();
+        //CheckPermission();
     }
 
     void CheckPermission()
