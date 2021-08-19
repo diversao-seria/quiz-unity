@@ -17,7 +17,7 @@ public class PowerUpController : MonoBehaviour
     public static int rightAnswerCount = 0;
     public bool leafImmunity = false, timeFreeze = false;
     public int fireComboNumber = 3, airRemovedAnswers = 2;
-    public GameObject powerUpButtonPrefab;
+    public GameObject powerUpButtonPrefab, powerUpAnimation;
     public Transform powerUpWrapper;
     public List<PowerUps> powerUps = new List<PowerUps>();
     [HideInInspector]
@@ -27,6 +27,8 @@ public class PowerUpController : MonoBehaviour
     public int[] randomIndex;
     public AudioClip[] audioClips;
     public Clock FreezeClock { get; set; }
+    public Color backgroundColor;
+    public RuntimeAnimatorController vento, gelo, folha; 
 
     private AudioSource audioSource;
     private JsonController jsonController;
@@ -35,6 +37,7 @@ public class PowerUpController : MonoBehaviour
     private Image bg;
     private Color grey = new Color(0.35294117647f, 0.35294117647f, 0.35294117647f);
     private GameObject[] answers;
+    private Animator animator;
 
     private enum Clip : int
     {
@@ -47,8 +50,10 @@ public class PowerUpController : MonoBehaviour
     void Start()
     {
         audioSource = gameObject.GetComponent<AudioSource>();
+        animator = powerUpAnimation.GetComponent<Animator>();
         bg = Background.GetComponent<Image>();
-        //bg.color = grey;
+        bg.color = backgroundColor;
+        powerUpAnimation.SetActive(false);
         FreezeClock = new Clock(0.0f);
         RestoreAllPowerUps();
     }
@@ -140,13 +145,15 @@ public class PowerUpController : MonoBehaviour
     public void WaterPowerUp()
     {
         timeFreeze = true;
+        StartCoroutine(PowerUpGeloAnim());
         jsonController.UsedPowerUp(GameMechanicsConstant.PowerUpNames.Water);
     }
 
     public void WaterPowerExpired() 
     {
         timeFreeze = false;
-        bg.color = grey;
+
+        bg.color = backgroundColor;
         FreezeClock.Reset();
     }
 
@@ -156,6 +163,7 @@ public class PowerUpController : MonoBehaviour
         List<int> indexes = new List<int>();
 
         airPowerUp = true;
+        StartCoroutine(PowerUpVentoAnim());
 
         for (int i = 0; i < answers.Length; i++)
         {
@@ -183,7 +191,6 @@ public class PowerUpController : MonoBehaviour
     public void AirPowerExpired()
     {
         airPowerUp = false;
-        bg.color = grey;
 
         if (answers != null)
         {
@@ -199,13 +206,15 @@ public class PowerUpController : MonoBehaviour
     public void EarthPowerUp()
     {
         leafImmunity = true;
+        
         jsonController.UsedPowerUp(GameMechanicsConstant.PowerUpNames.Earth);
     }
 
     public void LeafPowerExpired()
     {
         leafImmunity = false;
-        bg.color = grey;
+        //StartCoroutine(PowerUpFolhaAnim());
+        bg.color = backgroundColor;
     }
 
     private int[] ReturnRandomIndexes(int[] indexes, int n)
@@ -268,4 +277,39 @@ public class PowerUpController : MonoBehaviour
     {
         this.jsonController = jsonController;
     }
+    
+    IEnumerator PowerUpGeloAnim()
+    {
+        animator.runtimeAnimatorController = gelo;
+        powerUpAnimation.SetActive(true);
+        bg.color = powerUps[1].color;
+
+        yield return new WaitForSeconds(1.5f);
+        powerUpAnimation.SetActive(false);        
+    }
+
+    IEnumerator PowerUpVentoAnim()
+    {
+        animator.runtimeAnimatorController = vento;
+        powerUpAnimation.SetActive(true);
+        bg.color = powerUps[2].color;
+
+        yield return new WaitForSeconds(1f);
+
+        bg.color = backgroundColor;
+        powerUpAnimation.SetActive(false);
+    }
+
+    IEnumerator PowerUpFolhaAnim()
+    {
+        animator.runtimeAnimatorController = folha;
+        powerUpAnimation.SetActive(true);
+        bg.color = powerUps[0].color;
+
+        yield return new WaitForSeconds(2f);
+
+        bg.color = backgroundColor;
+        powerUpAnimation.SetActive(false);
+    }
+
 }

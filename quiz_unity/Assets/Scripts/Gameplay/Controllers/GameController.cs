@@ -350,4 +350,5 @@ public class GameController : MonoBehaviour
 		yield return new WaitForSeconds(2);
 		feedbackImage.gameObject.SetActive(false);
 	}
+
 }
