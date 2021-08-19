@@ -33,7 +33,7 @@ public class TutorialController : MonoBehaviour
         tutorial.Add(B8);
         tutorial.Add(B9);
         tutorial.Add(B10);
-        tutorial.Add(B11);
+        //tutorial.Add(B11);
         tutorial.Add(B12);
 
         //Inicia o tutorial
@@ -81,7 +81,7 @@ public class TutorialController : MonoBehaviour
 
         //Altera o texto
         Text text = balloon1.GetComponentInChildren<Text>();
-        text.text = "Bem-Vindo ao Quizle! Clique nas setas para aprender como se joga.";
+        text.text = "Bem-vindo ao Quizle! Clique nas setas para aprender como se joga.";
     }
 
 
@@ -192,7 +192,7 @@ public class TutorialController : MonoBehaviour
         //Muda a sprite e o texto do balão 6
         balloon6.transform.GetChild(1).GetComponent<Image>().sprite = wind;
         Text text = balloon6.GetComponentInChildren<Text>();
-        text.text = "Eliminar duas alternativas incorretas.";
+        text.text = "Elimina duas alternativas incorretas.";
     }
 
     private void B9()
@@ -211,11 +211,14 @@ public class TutorialController : MonoBehaviour
         //Estado 10 - Poderes Gelo
         balloon6.SetActive(true);
         balloon1.SetActive(false);
+        nextButton.SetActive(true);
+
+        skipButton.transform.GetChild(0).GetComponent<Text>().text = "Pular Tutorial";
 
         //Muda a sprite e o texto do balão 6
         balloon6.transform.GetChild(1).GetComponent<Image>().sprite = ice;
         Text text = balloon6.GetComponentInChildren<Text>();
-        text.text = "Após usar esse poder, o tempo da questão irá congelar por alguns segundos.";
+        text.text = "Após usar esse poder, o tempo da questão irá congelar por 7 segundos.";
     }
 
     private void B11()
@@ -234,6 +237,7 @@ public class TutorialController : MonoBehaviour
     private void B12()
     {
         //Estado 12 - Final
+        balloon6.SetActive(false);
         nextButton.SetActive(false);
         skipButton.transform.GetChild(0).GetComponent<Text>().text = "Começar";
 
