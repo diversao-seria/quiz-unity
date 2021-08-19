@@ -46,6 +46,9 @@ public class GameController : MonoBehaviour
 	private QuizClock quizClock;
 	private Clock freezeClock;
 
+	//public RuntimeAnimatorController certo,errado;
+	//private Animator animator;
+
 	enum Clip : int
     {
 		correct,
@@ -311,11 +314,13 @@ public class GameController : MonoBehaviour
 		if (isCorrect)
 		{
 			feedbackImage.GetComponent<Image>().sprite = correctAnswerIcon;
+			//animator.runtimeAnimatorController = certo;
 			// rightAnswers++;
 		}
 		else
 		{
 			feedbackImage.GetComponent<Image>().sprite = wrongAnswerIcon;
+			//animator.runtimeAnimatorController = errado;
 			streak = 0;
 		}
 
@@ -350,4 +355,5 @@ public class GameController : MonoBehaviour
 		yield return new WaitForSeconds(2);
 		feedbackImage.gameObject.SetActive(false);
 	}
+
 }
