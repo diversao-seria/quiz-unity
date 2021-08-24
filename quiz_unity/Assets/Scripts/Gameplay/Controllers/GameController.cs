@@ -145,7 +145,7 @@ public class GameController : MonoBehaviour
 						if(powerUpController.leafImmunity)
                         {
 							// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
-							StartCoroutine(WindVisualFeedback());
+							StartCoroutine(powerUpController.PowerUpFolhaAnim());
 							questionClock.NewCountdown(30);
 							eventManager.LetAnswerQuestion();
 							eventManager.ResetLastAnswerButton();
@@ -348,12 +348,12 @@ public class GameController : MonoBehaviour
 
 	}
 
-	public IEnumerator WindVisualFeedback()
+	/* public IEnumerator WindVisualFeedback()
     {
 		feedbackImage.GetComponent<Image>().sprite = wrongAnswerIcon;
 		feedbackImage.gameObject.SetActive(true);
 		yield return new WaitForSeconds(2);
 		feedbackImage.gameObject.SetActive(false);
-	}
+	} */
 
 }

@@ -300,7 +300,7 @@ public class PowerUpController : MonoBehaviour
         powerUpAnimation.SetActive(false);
     }
 
-    IEnumerator PowerUpFolhaAnim()
+    public IEnumerator PowerUpFolhaAnim()
     {
         animator.runtimeAnimatorController = folha;
         powerUpAnimation.SetActive(true);

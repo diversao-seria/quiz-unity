@@ -44,7 +44,7 @@ public class AnswerButton : MonoBehaviour
 		if (!eventManager.GetAnswerButton().alternative.IsCorrect && powerUpController.leafImmunity)
 		{
 			// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
-			StartCoroutine(gameController.WindVisualFeedback());
+			StartCoroutine(powerUpController.PowerUpFolhaAnim());
 			questionClock.NewCountdown(30);
 			eventManager.LetAnswerQuestion();
 			eventManager.ResetLastAnswerButton();
