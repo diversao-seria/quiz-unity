@@ -38,6 +38,7 @@ public class PowerUpController : MonoBehaviour
     private Color grey = new Color(0.35294117647f, 0.35294117647f, 0.35294117647f);
     private GameObject[] answers;
     private Animator animator;
+    private bool isFuryMode = false;
 
     private enum Clip : int
     {
@@ -71,9 +72,7 @@ public class PowerUpController : MonoBehaviour
             rightAnswerCount++;
             if (rightAnswerCount == fireComboNumber)
             {
-                Debug.Log("Fire");
-                bg.color = Color.red;
-                RestoreAllPowerUps();
+                EnableFuryMode();
             }
         }
         else
@@ -81,13 +80,28 @@ public class PowerUpController : MonoBehaviour
             if (leafImmunity)
             {
                 LeafPowerExpired();
+                bg.color = backgroundColor;
             }
             else
             {
-                rightAnswerCount = 0;
-                bg.color = grey;
+                DisableFuryMode();
             }
         }
+    }
+
+    private void EnableFuryMode()
+    {
+        Debug.Log("Fire");
+        bg.color = Color.red;
+        isFuryMode = true;
+        RestoreAllPowerUps();
+    }
+
+    private void DisableFuryMode()
+    {
+        rightAnswerCount = 0;
+        isFuryMode = false;
+        bg.color = backgroundColor;
     }
 
     public void RestoreAllPowerUps()
@@ -153,7 +167,15 @@ public class PowerUpController : MonoBehaviour
     {
         timeFreeze = false;
 
-        bg.color = backgroundColor;
+        if (isFuryMode)
+        {
+            bg.color = Color.red;
+        }
+        else
+        {
+            bg.color = backgroundColor;
+        }
+
         FreezeClock.Reset();
     }
 
@@ -201,6 +223,15 @@ public class PowerUpController : MonoBehaviour
                 answers[i].transform.GetChild(0).gameObject.SetActive(true);
             }
         }
+
+        if (isFuryMode)
+        {
+            bg.color = Color.red;
+        }
+        else
+        {
+            bg.color = backgroundColor;
+        }
     }
 
     public void EarthPowerUp()
@@ -214,7 +245,14 @@ public class PowerUpController : MonoBehaviour
     {
         leafImmunity = false;
         //StartCoroutine(PowerUpFolhaAnim());
-        bg.color = backgroundColor;
+        if (isFuryMode)
+        {
+            bg.color = Color.red;
+        }
+        else
+        {
+            bg.color = backgroundColor;
+        }
     }
 
     private int[] ReturnRandomIndexes(int[] indexes, int n)
@@ -284,7 +322,7 @@ public class PowerUpController : MonoBehaviour
         powerUpAnimation.SetActive(true);
         bg.color = powerUps[1].color;
 
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(GameMechanicsConstant.IceAnimationTimeinSeconds);
         powerUpAnimation.SetActive(false);        
     }
 
@@ -294,9 +332,17 @@ public class PowerUpController : MonoBehaviour
         powerUpAnimation.SetActive(true);
         bg.color = powerUps[2].color;
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(GameMechanicsConstant.WindAnimationTimeinSeconds);
 
-        bg.color = backgroundColor;
+        if (isFuryMode)
+        {
+            bg.color = Color.red;
+        }
+        else
+        {
+            bg.color = backgroundColor;
+        }
+
         powerUpAnimation.SetActive(false);
     }
 
@@ -306,9 +352,17 @@ public class PowerUpController : MonoBehaviour
         powerUpAnimation.SetActive(true);
         bg.color = powerUps[0].color;
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(GameMechanicsConstant.LeafAnimationTimeinSeconds);
 
-        bg.color = backgroundColor;
+        if (isFuryMode)
+        {
+            bg.color = Color.red;
+        }
+        else
+        {
+            bg.color = backgroundColor;
+        }
+
         powerUpAnimation.SetActive(false);
     }
 

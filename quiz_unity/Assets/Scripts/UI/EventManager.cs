@@ -16,7 +16,7 @@ public class EventManager : MonoBehaviour
 
     private List<GameObject> answerButtonList;
 
-    public float answerConfirmation = 3.0f;   
+    public float answerConfirmation = GameMechanicsConstant.AnswerConfirmationTimeinSeconds;   
 
     private AnswerButton selectedAnswerButton;
     private Slider progressSlider;
