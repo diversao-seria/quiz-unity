@@ -279,8 +279,6 @@ public class PowerUpController : MonoBehaviour
         return randomIndexes;
     }
 
-
-
     public void UsePowerUp(GameMechanicsConstant.PowerUpNames name)
     {
         PowerUps pw = new PowerUps();
