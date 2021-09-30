@@ -89,13 +89,14 @@ public class PreGameController : MonoBehaviour
     {
         string url = "https://ds-quiz.herokuapp.com/quiz?code=" + quizCode;
 
-        EnableLoadingUI();
-
         using (www = UnityWebRequest.Get(url))
         {
+            EnableLoadingUI();
+            www.timeout = 10;
             requestStatus = true;
             yield return www.SendWebRequest();
-            if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            //if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
+            if(www.result != UnityWebRequest.Result.Success)
             {
                 requestStatus = false;
                 errorText = "Erro ao baixar o arquivo.\n" + www.error.ToString();
@@ -104,17 +105,21 @@ public class PreGameController : MonoBehaviour
             }
             else
             {
+                //Debug.Log("textDWN: " + www.downloadHandler.text.Equals("null"));
+                // If the quiz is valid, a json data will be returned.
+                if (!www.downloadHandler.text.Equals("null"))
+                {
+                    // Build path quiz directory
+                    string path = Application.persistentDataPath + Path.AltDirectorySeparatorChar
+                        + DataManagementConstant.QuizFolderRelativePath + quizCode + ".json";
+                    Debug.Log("path: " + path);
 
-                // Build path quiz directory
-                string path = Application.persistentDataPath + Path.AltDirectorySeparatorChar
-                    + DataManagementConstant.QuizFolderRelativePath + quizCode + ".json";
-                Debug.Log("path: " + path);
-
-                dataController.GetComponent<DataController>().WriteOnPath(path, www.downloadHandler.text);
+                    dataController.GetComponent<DataController>().WriteOnPath(path, www.downloadHandler.text);
+                }
             }
 
             // Check if quiz's json is in correct place. 
-            if (isQuizAvailable(quizCode))
+            if (!www.downloadHandler.text.Equals("null") && isQuizAvailable(quizCode))
             {
                 downloadProgess.text = "OK";
                 yield return new WaitForSeconds(1);

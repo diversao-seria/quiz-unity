@@ -36,7 +36,6 @@ public class ResultGameController : MonoBehaviour
 
     void Awake()
     {
-
         leftStar = starWrapper.transform.Find("LeftStar").gameObject;
         centralStar = starWrapper.transform.Find("CentralStar").gameObject;
         rightStar = starWrapper.transform.Find("RightStar").gameObject;
@@ -44,7 +43,6 @@ public class ResultGameController : MonoBehaviour
         questionAnswer = dataController.GetQuestionAnswers();
         resultPool = FindObjectOfType<ResultPool>();
         generateAnswers();
-
     }
 
     void Start()
