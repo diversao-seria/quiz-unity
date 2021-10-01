@@ -21,6 +21,7 @@ public class PreGameController : MonoBehaviour
     public Text downloadProgess;
     public GameObject spinner;
     public GameObject fadeMask;
+    public GameObject textProgressObject;
 
     private UnityWebRequest www;
 
@@ -46,6 +47,11 @@ public class PreGameController : MonoBehaviour
     {
         // put quizcode on upper case
         string quizCode = inputText.GetComponent<Text>().text.ToUpper();
+
+
+
+
+
         StartCoroutine(GetFile(quizCode));
 
         // Net Controller Search routine.
@@ -63,8 +69,6 @@ public class PreGameController : MonoBehaviour
 
     private void LoadQuiz(string quizCode)
     {
-        // TO DO: make user wait
-        downloadProgess.text = "0";
         dataController.GetComponent<DataController>().PreLoadQuiz(quizCode);
         StartQuiz(quizCode);
     }
@@ -91,24 +95,33 @@ public class PreGameController : MonoBehaviour
 
         using (www = UnityWebRequest.Get(url))
         {
-            EnableLoadingUI();
             www.timeout = 10;
-            requestStatus = true;
-            yield return www.SendWebRequest();
-            //if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
-            if(www.result != UnityWebRequest.Result.Success)
+            EnableLoadingUI();
+
+            //yield return www.SendWebRequest();
+            www.SendWebRequest();
+
+            while(!www.isDone)
             {
-                requestStatus = false;
-                errorText = "Erro ao baixar o arquivo.\n" + www.error.ToString();
-                DisableLoadingUI();
+                // DOwnload PRogess
+                var progressValue = www.downloadProgress * 100;
+                textProgressObject.GetComponent<Text>().text = progressValue.ToString() + "%";
+                //textProgressObject
                 yield return null;
+            }
+
+            // Check if the request was sucessful
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                errorText = "Erro ao baixar o arquivo.\n" + www.error.ToString();
+                //DisableLoadingUI();
             }
             else
             {
-                //Debug.Log("textDWN: " + www.downloadHandler.text.Equals("null"));
                 // If the quiz is valid, a json data will be returned.
                 if (!www.downloadHandler.text.Equals("null"))
                 {
+                    textProgressObject.GetComponent<Text>().text = "100%";
                     // Build path quiz directory
                     string path = Application.persistentDataPath + Path.AltDirectorySeparatorChar
                         + DataManagementConstant.QuizFolderRelativePath + quizCode + ".json";
@@ -118,32 +131,21 @@ public class PreGameController : MonoBehaviour
                 }
             }
 
+            // DisableLoadingUI();
+
             // Check if quiz's json is in correct place. 
             if (!www.downloadHandler.text.Equals("null") && isQuizAvailable(quizCode))
             {
-                downloadProgess.text = "OK";
-                yield return new WaitForSeconds(1);
-                // DisableLoadingUI();
+                // downloadProgess.text = "OK";
                 LoadQuiz(quizCode);
             }
             else
             {
-                DisableLoadingUI();
                 Debug.Log(errorText);
+                DisableLoadingUI();
                 errorController.GetComponent<PopupHandler>().InitialExitBehaviour("error");               
             }
-            requestStatus = false;
         }
-    }
-
-    public UnityWebRequest GetRequestConnectionInstance()
-    {
-        return www;
-    }
-
-    public bool GetRequestStatus()
-    {
-        return requestStatus;
     }
 
     private void EnableLoadingUI()
