@@ -3,23 +3,29 @@ using System.Collections.Generic;
 using UnityEngine.Networking;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using System.Text;
 
 public class LoginController : MonoBehaviour
 {
-    public GameObject signInPanel, loginPanel;
-    public Text text;
+    public GameObject signInPanel, loginPanel, popupPanel;
+    public Text ErrorText;
     public InputField user, password;
     public InputField rname, remail, rcemail, rusername, rpassword, rcpassword;
+    public Button popupCloseButton;
     private string jsonString;
+    private UserController userController;
+
     // Start is called before the first frame update
     void Start()
     {
+        popupPanel.SetActive(false);
         signInPanel.SetActive(false);
         loginPanel.SetActive(true);
-
+        userController = GameObject.Find("UserController").GetComponent<UserController>();
+        ErrorText.text = "";
         //StartCoroutine(LoginUser("teste", "12345"));
     }
 
@@ -38,6 +44,7 @@ public class LoginController : MonoBehaviour
 
     public void SignInButton()
     {
+        ErrorText.text = "";
         signInPanel.SetActive(true);
         loginPanel.SetActive(false);
     }
@@ -45,16 +52,16 @@ public class LoginController : MonoBehaviour
     public void FinishSignInButton()
     {
         //Finalizar Cadastro
+        ErrorText.text = "";
         RegisterUser();
-        signInPanel.SetActive(false);
-        loginPanel.SetActive(true);     
+  
     }
 
     public void BackButton()
     {
+        ErrorText.text = "";
         signInPanel.SetActive(false);
         loginPanel.SetActive(true);
-
     }
 
     private WWW RegisterPostRequest()
@@ -82,13 +89,25 @@ public class LoginController : MonoBehaviour
         yield return data; 
         if (data.error != null)
         {
+            popupCloseButton.interactable = true;
             Debug.Log("Erro: " + data.error);
             if (data.error == "422 Unprocessable Entity")
             {
                 var jsonObj = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(data.text);
+                ErrorText.text = "";
                 foreach (KeyValuePair<string, List<string>> kvp in jsonObj)
                 {
                     Debug.Log(kvp.Key + " " + kvp.Value[0]);
+                    ErrorText.text += kvp.Key + " " + kvp.Value[0] + "\n";
+                    if(kvp.Key == "username")
+                    {
+                        rusername.text = "";
+                    }
+                    if (kvp.Key == "email")
+                    {
+                        remail.text = "";
+                        rcemail.text = "";
+                    }
                 }
                 //Debug.Log("O email informado " + jsonObj["username"]);
                // Debug.Log("O nome de usuário informado " + jsonObj.username[0]);
@@ -97,7 +116,37 @@ public class LoginController : MonoBehaviour
         else
         {
             Debug.Log("Sucesso! " + data.text);
+            RegisterSuccess();
         }
+    }
+
+    private void RegisterSuccess()
+    {
+        userController.playername = rname.text.ToString();
+        userController.email = remail.text.ToString();
+        userController.username = rusername.text.ToString();
+
+        rname.text = "";
+        remail.text = "";
+        rcemail.text = "";
+        rusername.text = "";
+        rpassword.text = "";
+        rcpassword.text = "";
+
+        signInPanel.SetActive(false);
+        loginPanel.SetActive(true);
+        PopupOpen();
+        popupCloseButton.interactable = true;
+        ErrorText.text = "Cadastro efetuado com sucesso!";
+    }
+
+    private void LoginSuccess()
+    {
+        userController.loggedIn = true;
+        PopupOpen();
+        popupCloseButton.interactable = true;
+        ErrorText.text = "Login efetuado com sucesso!";
+        Debug.Log("Login Successesful");
     }
 
     private void RegisterUser()
@@ -109,29 +158,50 @@ public class LoginController : MonoBehaviour
         string vpass = rpassword.text.ToString();
         string vcpass = rcpassword.text.ToString();
 
+        //Show error
+        //Clear input field with error
 
         if (vname == "" || vname.Length > 50)
         {
+            PopupOpen();
+            ErrorText.text = "Erro: Nome inválido. Seu nome não deve conter mais de 50 caracteres.";
+            rname.text = "";
             Debug.Log("Nome inválido. Seu nome não deve conter mais de 50 caracteres.");
         }
         else if (vemail == "" || !checkEmail(vemail))
         {
+            PopupOpen();
+            ErrorText.text = "Erro: Email inválido.";
+            remail.text = "";
             Debug.Log("Email inválido.");
         }
         else if (vemail != vcemail)
         {
+            PopupOpen();
+            ErrorText.text = "Erro: Os emails informados são diferentes.";
             Debug.Log("Os emails informados são diferentes.");
         }
         else if (vusername.Length < 4 || vusername.Length > 20)
         {
+            PopupOpen();
+            ErrorText.text = "Erro: Nome de usuário inválido. Seu nome de usuário deve conter entre 4 e 20 caracteres.";
+            rusername.text = "";
             Debug.Log("Nome de usuário inválido. Seu nome de usuário deve conter entre 4 e 20 caracteres.");
         }
         else if (vpass.Length < 6)
         {
+            PopupOpen();
+            ErrorText.text = "Erro: Senha inválida. Sua senha deve ter no mínimo 6 caracteres.";
+            rpassword.text = "";
+            rcpassword.text = "";
             Debug.Log("Senha inválida. Sua senha deve ter no mínimo 6 caracteres.");
         }
         else if (vpass != vcpass)
         {
+            PopupOpen();
+            ErrorText.text = "Erro: As senhas informadas são diferentes.";
+            rcpassword.text = "";
+            rpassword.text = "";
             Debug.Log("As senhas informadas são diferentes.");
         }
         else
@@ -146,6 +216,10 @@ public class LoginController : MonoBehaviour
             playerObj.player = data;
 
             jsonString = JsonUtility.ToJson(playerObj);
+
+            PopupOpen();
+            ErrorText.text = "Aguarde...";
+            popupCloseButton.interactable = false;
 
             RegisterPostRequest();
         }
@@ -189,11 +263,16 @@ public class LoginController : MonoBehaviour
         }
     }
 
+
+    //Username can be Usuário or E-mail
     IEnumerator LoginUser(string username, string password)
     {
         WWWForm form = new WWWForm();
         form.AddField("login", username);
         form.AddField("password", password);
+        PopupOpen();
+        ErrorText.text = "Aguarde...";
+        popupCloseButton.interactable = false;
 
         string url = "http://ds-quiz.herokuapp.com/authenticate";
 
@@ -204,12 +283,18 @@ public class LoginController : MonoBehaviour
             if (www.result != UnityWebRequest.Result.Success)
             {
                 //Debug.Log(www.error);
+                popupCloseButton.interactable = true;
                 Debug.Log(www.downloadHandler.text);
                 var value = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(www.downloadHandler.text);
                 foreach (var resp in value)
                 {
                     Debug.Log(resp.Value["player_authentication"]);
-                    text.text = resp.Value["player_authentication"];
+
+                    if (resp.Value["player_authentication"] ==  "invalid credentials")
+                    {
+
+                        ErrorText.text = "Credenciais inválidas";
+                    }
                 }
             }
             else
@@ -219,12 +304,42 @@ public class LoginController : MonoBehaviour
                 foreach (KeyValuePair<string, string> resp in value)
                 {
                     Debug.Log(resp.Key + " " + resp.Value);
-                    text.text += resp.Key + " " + resp.Value + "\n";
+                    if (resp.Key == "auth_token")
+                    {
+                        userController.auth_token = resp.Value;
+                    }
+                    else if(resp.Key == "player_id")
+                    {
+                        userController.player_id = resp.Value;
+                    }
                 }
-                Debug.Log(www.downloadHandler.text +  "\n success");
+                if (checkEmail(username))
+                {
+                    userController.email = username;
+                }
+                else
+                {
+                    userController.username = username;
+                }
+                LoginSuccess();
             }
         }
     }
 
+    public void CloseSceneButton()
+    {
+        userController.isGuest = true;
+        SceneManager.UnloadSceneAsync("Login");
+    }
 
+    public void PopupCloseButton()
+    {
+        popupPanel.SetActive(false);
+    }
+
+    private void PopupOpen()
+    {
+        ErrorText.text = "";
+        popupPanel.SetActive(true);
+    }
 }
