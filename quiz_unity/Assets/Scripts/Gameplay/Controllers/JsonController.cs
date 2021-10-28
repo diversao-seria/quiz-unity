@@ -70,6 +70,11 @@ public class JsonController : MonoBehaviour
         quizResultData.QuizID = id;
     }
 
+    public void SetPlayerID(int id)
+    {
+        quizResultData.PlayerID = id;
+    }
+
     public void RegisterStartTime()
     {
         quizResultData.StartTime = System.DateTime.Now.ToString();

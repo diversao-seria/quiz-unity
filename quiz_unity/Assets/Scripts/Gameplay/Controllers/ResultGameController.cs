@@ -12,6 +12,7 @@ public class ResultGameController : MonoBehaviour
     private DataController dataController;
     private QuestionAnswer questionAnswer;
     private ResultPool resultPool;
+    public bool dataFormisDone;
 
     // Result Screen
     public GameObject m_prefab_container;
@@ -36,6 +37,7 @@ public class ResultGameController : MonoBehaviour
 
     void Awake()
     {
+        dataFormisDone = false;
         leftStar = starWrapper.transform.Find("LeftStar").gameObject;
         centralStar = starWrapper.transform.Find("CentralStar").gameObject;
         rightStar = starWrapper.transform.Find("RightStar").gameObject;
@@ -48,7 +50,7 @@ public class ResultGameController : MonoBehaviour
     void Start()
     {
         ShowPlayerAnswers();
-        // SendPlayerData(dataController.QuizCode);
+        SendPlayerData(dataController.QuizCode);
     }
 
     // Update is called once per frame
@@ -197,21 +199,35 @@ public class ResultGameController : MonoBehaviour
 
         using (UnityWebRequest www = UnityWebRequest.Post(url, "POST"))
         {
+            www.timeout = 10;
             byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
             www.SetRequestHeader("Content-Type", "application/json");
             www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
-            yield return www.SendWebRequest();
+
+            www.SendWebRequest();
+
+            while(!www.isDone)
+            {
+                yield return null;
+            }
+
             Debug.Log("Status Code: " + www.responseCode);
 
             if (www.result != UnityWebRequest.Result.Success)
             {
+                // Sem internet -> 0
+
                 Debug.Log(www.error);
                 Debug.Log(www.downloadHandler.text);
+
+
             }
             else
             {
                 Debug.Log("Form upload complete!");
             }
+
         }
+        dataFormisDone = true;
     }
 }

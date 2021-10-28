@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ExitHandler : MonoBehaviour
+public class PopupHandler : MonoBehaviour
 {
     public GameObject screenController;
     public GameObject m_exitPopup;
@@ -50,6 +50,18 @@ public class ExitHandler : MonoBehaviour
         UnityEngine.SceneManagement.SceneManager.LoadScene(0);
     }
 
+    public void ReturnToMainWebSafe()
+    {
+        // Check if web was sucessfull
+
+        while (!this.GetComponent<ResultTransferCheck>().isPOSTRequestDone())
+        {
+            Debug.Log("waiting... rquest status");// Loading UI
+        }
+
+        UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+    }
+
     public void FinishExitBehaviour(string type)
     {
         Button[] buttons = FindObjectOfType<Canvas>().gameObject.GetComponentsInChildren<Button>();
@@ -64,6 +76,37 @@ public class ExitHandler : MonoBehaviour
         {
             ToggleObjectsFromParent(m_exitPopup.transform, false);
         }     
+        else
+        {
+            ToggleObjectsFromParent(m_errorPopup.transform, false);
+        }
+    }
+
+    public void FinishExitBehaviourWebSafe(string type)
+    {
+        Button[] buttons = FindObjectOfType<Canvas>().gameObject.GetComponentsInChildren<Button>();
+
+        // Make anything child of canvas interactable.
+        foreach (Button button in buttons)
+        {
+            button.enabled = true;
+        }
+
+        // Enabled UI
+
+        while(!this.GetComponent<ResultTransferCheck>().isPOSTRequestDone())
+        {
+            Debug.Log("waiting... rquest status");// Loading UI
+        }
+
+        // IF -> connection failst...
+
+        // Disable UI
+
+        if (type == "exit")
+        {
+            ToggleObjectsFromParent(m_exitPopup.transform, false);
+        }
         else
         {
             ToggleObjectsFromParent(m_errorPopup.transform, false);
