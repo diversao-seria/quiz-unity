@@ -70,8 +70,12 @@ public class GameController : MonoBehaviour
 		currentRoundData = dataController.CurrentRoundData;                      // Ask the DataController for the data for the current round. At the moment, we only have one round - but we could extend this
 		questionPool = dataController.RetrieveQuiz().Questions;      // Take a copy of the questions so we could shuffle the pool or drop questions from it without affecting the original RoundData object
 		dataController.TrackQuestionsAnswers(questionPool.Count);
+		
 		jsonController.SetTotalNumberOfQuestions(questionPool.Count);
 		jsonController.SetQuizID(dataController.RetrieveQuiz().Id);
+
+		
+		jsonController.SetPlayerID(1); // Annonymous
 
 		powerUpController = this.gameObject.GetComponent<PowerUpController>();
 		powerUpController.SetJsonControllerReference(jsonController);
