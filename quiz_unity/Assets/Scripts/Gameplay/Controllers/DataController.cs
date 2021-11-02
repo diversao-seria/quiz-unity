@@ -11,6 +11,7 @@ using System.Text;
 public class DataController : MonoBehaviour
 {
 	public RoundData CurrentRoundData { get; set; }
+	public NetController netController;
 
 	public string QuizCode { get; set; }
 
@@ -19,7 +20,12 @@ public class DataController : MonoBehaviour
 	private Quiz currentQuiz;
 	private string filenameJSON;
 
-	public NetController netController;
+	private FileStream activeStream = null;
+
+	private string currentQuizPlayerDataPath = null;
+
+
+	public StreamWriter activeQuizDataWriter = null;
 
 	
 
@@ -108,6 +114,7 @@ public class DataController : MonoBehaviour
 		}
 	}
 
+	// For web related files.
 	public void WriteOnPath(string path, string text)
 	{
 
@@ -126,7 +133,7 @@ public class DataController : MonoBehaviour
 		}
 		catch (DirectoryNotFoundException dirE)
 		{
-			// This exception is thrown if if there is no quiz folder.
+			// This exception is thrown if there is no quiz folder.
 			Debug.Log(dirE.GetType().Name + ".\n Caminho não existente. Criando...");
 
 			CreateDirectoryFromPath(path,text);
@@ -137,6 +144,86 @@ public class DataController : MonoBehaviour
 			Debug.Log(ioE.GetType().Name + "Erro ao escrever pastas/arquivos. Tentar de novo ou armazenamento está cheio.");
 			// TO DO:  Feedback Visual.
 		}
+	}
+
+
+
+	// Singleton
+	public void SetJSONWriter(string path, string text)
+    {
+
+        try 
+		{
+			if (activeStream == null)
+			{
+				activeStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
+			}
+			if (activeQuizDataWriter == null)
+			{
+				activeQuizDataWriter = new StreamWriter(activeStream, Encoding.UTF8); ;
+			}
+		// TO DO:  Feedback Visual.
+		}
+		catch (DirectoryNotFoundException dirE)
+		{
+			// This exception is thrown if there is no quiz folder.
+			Debug.Log(dirE.GetType().Name + ".\n Caminho não existente. Criando...");
+			CreateDirectoryFromPath(path, text);
+		}
+		catch (IOException ioE)
+		{
+			// Exception when problems related to writting occurs (like disk is full)
+			Debug.Log(ioE.GetType().Name + "Erro ao escrever pastas/arquivos. Tentar de novo ou armazenamento está cheio.");
+			// TO DO:  Feedback Visual.
+		}
+	}
+
+	public void SetCurrentSessionPath(string currentQuizPlayerDataPath)
+    {
+		this.currentQuizPlayerDataPath = currentQuizPlayerDataPath;
+    }
+
+	public void UpdateJSONPlayerData(string text)
+    {
+		try
+		{
+				activeStream = new FileStream(currentQuizPlayerDataPath, FileMode.Create, FileAccess.Write, FileShare.None);
+				activeQuizDataWriter = new StreamWriter(activeStream, Encoding.UTF8); 
+			
+			// TO DO:  Feedback Visual.
+		}
+		catch (DirectoryNotFoundException dirE)
+		{
+			// This exception is thrown if there is no quiz folder.
+			Debug.Log(dirE.GetType().Name + ".\n Caminho não existente. Criando...");
+			CreateDirectoryFromPath(currentQuizPlayerDataPath, "");
+		}
+		catch (IOException ioE)
+		{
+			// Exception when problems related to writting occurs (like disk is full)
+			Debug.Log(ioE.GetType().Name + "Erro ao escrever pastas/arquivos. Tentar de novo ou armazenamento está cheio.");
+			// TO DO:  Feedback Visual.
+		}
+
+		activeQuizDataWriter.Write(text);
+	}
+
+	// Singleton
+	public FileStream GetStream(string path)
+    {
+		if(activeStream == null)
+        {
+			return new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
+		}
+		return activeStream;
+    }
+
+	public void CloseJSONFile()
+    {
+		activeQuizDataWriter.Close();
+		activeStream.Close();
+		activeQuizDataWriter = null;
+		activeStream = null;
 	}
 
 	// Populate all relevant classes with the JSON provided.

@@ -66,7 +66,6 @@ public class GameController : MonoBehaviour
 		audioSource = gameObject.GetComponent<AudioSource>();
 		eventManager = GetComponent<EventManager>();
 
-
 		currentRoundData = dataController.CurrentRoundData;                      // Ask the DataController for the data for the current round. At the moment, we only have one round - but we could extend this
 		questionPool = dataController.RetrieveQuiz().Questions;      // Take a copy of the questions so we could shuffle the pool or drop questions from it without affecting the original RoundData object
 		dataController.TrackQuestionsAnswers(questionPool.Count);
@@ -99,7 +98,16 @@ public class GameController : MonoBehaviour
 		ShowQuestion();
 		ShowQuestionNumber();
 
-		jsonController.RegisterStartTime();	// records the current system time and date
+		jsonController.RegisterStartTime(); // records the current system time and date
+
+		string quizPlayerDataPath = Application.persistentDataPath +
+									  Path.AltDirectorySeparatorChar +
+									  DataManagementConstant.PlayerDataPath +
+									  dataController.QuizCode + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerQuizDataFile;
+
+		dataController.SetCurrentSessionPath(quizPlayerDataPath);
+		dataController.UpdateJSONPlayerData(jsonController.SerializeAnswerData());
+		dataController.CloseJSONFile();
 
 		isRoundActive = true;
 	}
@@ -223,6 +231,11 @@ public class GameController : MonoBehaviour
 			);
 
 
+		dataController.UpdateJSONPlayerData(jsonController.SerializeAnswerData());
+		dataController.CloseJSONFile();
+
+
+		// Set Up for Next question;
 		jsonController.UpdateTotalTime((int)(30 - questionClock.Time));
 
 		eventManager.resetTouchClock();
@@ -283,21 +296,26 @@ public class GameController : MonoBehaviour
 		questionDisplay.SetActive(false);
 		roundEndDisplay.SetActive(true);
 
-		string folderPath = currentRoundData.FolderPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerQuizDataFile;
-		jsonController.DEBUGPlayerJSONData();
+		// string folderPath = currentRoundData.FolderPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerQuizDataFile;
+		// jsonController.DEBUGPlayerJSONData();
 
-		// Creating file with quiz results
-		if (File.Exists(folderPath))
+		/*
+		if (File.Exists(quizPlayerDataPath))
 		{
-			// Making sure there's only one file at one point in time
 			File.Delete(folderPath); 
 		}
+		*/
 
 		jsonController.UpdateScore(playerScore);
-		dataController.WriteOnPath(currentRoundData.FolderPath + 
+
+		// WIP: Writing must be done for each question
+		/* dataController.WriteOnPath(currentRoundData.FolderPath + 
 								   Path.AltDirectorySeparatorChar + 
 									DataManagementConstant.PlayerQuizDataFile, jsonController.SerializeAnswerData());
+		*/ 
 
+		// At this points, the content of the JSON is what expected to be and there was no interruptions.
+		jsonController.FlagSessionInterrupt(true);
 
 		Debug.Log("Total time: " + quizClock.HHmmss());
 
