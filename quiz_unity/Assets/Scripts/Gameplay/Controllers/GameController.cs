@@ -22,6 +22,8 @@ public class GameController : MonoBehaviour
 	public Sprite correctAnswerIcon;
 	public Sprite wrongAnswerIcon;
 	public AudioClip[] audioClips;
+	public Image blockerImage;
+	public GameObject exitPopUp;
 
 	private DataController dataController;
 	private RoundData currentRoundData;
@@ -66,7 +68,6 @@ public class GameController : MonoBehaviour
 		audioSource = gameObject.GetComponent<AudioSource>();
 		eventManager = GetComponent<EventManager>();
 
-
 		currentRoundData = dataController.CurrentRoundData;                      // Ask the DataController for the data for the current round. At the moment, we only have one round - but we could extend this
 		questionPool = dataController.RetrieveQuiz().Questions;      // Take a copy of the questions so we could shuffle the pool or drop questions from it without affecting the original RoundData object
 		dataController.TrackQuestionsAnswers(questionPool.Count);
@@ -99,7 +100,16 @@ public class GameController : MonoBehaviour
 		ShowQuestion();
 		ShowQuestionNumber();
 
-		jsonController.RegisterStartTime();	// records the current system time and date
+		jsonController.RegisterStartTime(); // records the current system time and date
+
+		string quizPlayerDataPath = Application.persistentDataPath +
+									  Path.AltDirectorySeparatorChar +
+									  DataManagementConstant.PlayerDataPath +
+									  dataController.QuizCode + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerQuizDataFile;
+
+		dataController.SetCurrentSessionPath(quizPlayerDataPath);
+		dataController.UpdateJSONPlayerData(jsonController.SerializeAnswerData());
+		dataController.CloseJSONFile();
 
 		isRoundActive = true;
 	}
@@ -205,6 +215,12 @@ public class GameController : MonoBehaviour
 
 	public void AnswerButtonClicked(bool isCorrect, int alternativeNumber)
 	{
+		// Block all UI interactions.
+		blockerImage.transform.gameObject.SetActive(true);
+
+		// Close any popups
+		if (exitPopUp.activeInHierarchy) exitPopUp.GetComponent<PopupHandler>().FinishExitBehaviour("exit");
+
 		// To be shown to player later 
 		dataController.GetQuestionAnswers().RegisterPlayerAnswer(
 				eventManager,
@@ -223,6 +239,11 @@ public class GameController : MonoBehaviour
 			);
 
 
+		dataController.UpdateJSONPlayerData(jsonController.SerializeAnswerData());
+		dataController.CloseJSONFile();
+
+
+		// Set Up for Next question;
 		jsonController.UpdateTotalTime((int)(30 - questionClock.Time));
 
 		eventManager.resetTouchClock();
@@ -275,6 +296,7 @@ public class GameController : MonoBehaviour
 
 	public void EndRound()
 	{
+		jsonController.FlagSessionInterrupt(true);
 		isRoundActive = false;
 
 		dataController.SubmitNewScore(playerScore);
@@ -283,21 +305,25 @@ public class GameController : MonoBehaviour
 		questionDisplay.SetActive(false);
 		roundEndDisplay.SetActive(true);
 
-		string folderPath = currentRoundData.FolderPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerQuizDataFile;
-		jsonController.DEBUGPlayerJSONData();
+		// string folderPath = currentRoundData.FolderPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerQuizDataFile;
+		// jsonController.DEBUGPlayerJSONData();
 
-		// Creating file with quiz results
-		if (File.Exists(folderPath))
+		/*
+		if (File.Exists(quizPlayerDataPath))
 		{
-			// Making sure there's only one file at one point in time
 			File.Delete(folderPath); 
 		}
+		*/
 
 		jsonController.UpdateScore(playerScore);
-		dataController.WriteOnPath(currentRoundData.FolderPath + 
+
+		// WIP: Writing must be done for each question
+		/* dataController.WriteOnPath(currentRoundData.FolderPath + 
 								   Path.AltDirectorySeparatorChar + 
 									DataManagementConstant.PlayerQuizDataFile, jsonController.SerializeAnswerData());
+		*/ 
 
+		// At this points, the content of the JSON is what expected to be and there was no interruptions.
 
 		Debug.Log("Total time: " + quizClock.HHmmss());
 
@@ -330,21 +356,24 @@ public class GameController : MonoBehaviour
 
 		if (questionPool.Count > questionIndex + 1)                                         // If there are more questions, show the next question
 		{
+			// Load Next Question to be answered.
 			questionIndex++;
 			questionNumberTextController.GetComponent<QuestionNumberController>().NextQuestion();
-			// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
-			questionClock.NewCountdown(30);
 			ShowQuestion();
-
 			ShowQuestionNumber();
 			isQuestionAnswered = false;
 			eventManager.LetAnswerQuestion();
+
+			// New Countdown
+			questionClock.NewCountdown(30);
+			// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
+
+			// Allow all UI interactions.
+			blockerImage.transform.gameObject.SetActive(false);
 		}
 		else                                                                                // If there are no more questions, the round ends
 		{
-
 			EndRound();
 		}
-
 	}
 }

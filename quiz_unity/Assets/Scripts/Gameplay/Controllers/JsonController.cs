@@ -19,6 +19,10 @@ public class JsonController : MonoBehaviour
     // Each question data.
     List<QuestionAnswerData> questionAnswerDataList = null;
 
+    // For interrupt
+    private bool isSessionFinished = false;
+
+
     public void SetNewQuizResultData()
     {
 
@@ -91,6 +95,11 @@ public class JsonController : MonoBehaviour
         {
             RegisteredHabilityList[i] = "0";
         }
+    }
+
+    public void FlagSessionInterrupt(bool status)
+    {
+        isSessionFinished = status;
     }
 
     public void FinishSetQuizData()
