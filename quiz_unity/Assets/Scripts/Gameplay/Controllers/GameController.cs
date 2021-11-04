@@ -22,6 +22,8 @@ public class GameController : MonoBehaviour
 	public Sprite correctAnswerIcon;
 	public Sprite wrongAnswerIcon;
 	public AudioClip[] audioClips;
+	public Image blockerImage;
+	public GameObject exitPopUp;
 
 	private DataController dataController;
 	private RoundData currentRoundData;
@@ -213,6 +215,12 @@ public class GameController : MonoBehaviour
 
 	public void AnswerButtonClicked(bool isCorrect, int alternativeNumber)
 	{
+		// Block all UI interactions.
+		blockerImage.transform.gameObject.SetActive(true);
+
+		// Close any popups
+		if (exitPopUp.activeInHierarchy) exitPopUp.GetComponent<PopupHandler>().FinishExitBehaviour("exit");
+
 		// To be shown to player later 
 		dataController.GetQuestionAnswers().RegisterPlayerAnswer(
 				eventManager,
@@ -348,15 +356,20 @@ public class GameController : MonoBehaviour
 
 		if (questionPool.Count > questionIndex + 1)                                         // If there are more questions, show the next question
 		{
+			// Load Next Question to be answered.
 			questionIndex++;
 			questionNumberTextController.GetComponent<QuestionNumberController>().NextQuestion();
-			// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
-			questionClock.NewCountdown(30);
 			ShowQuestion();
-
 			ShowQuestionNumber();
 			isQuestionAnswered = false;
 			eventManager.LetAnswerQuestion();
+
+			// New Countdown
+			questionClock.NewCountdown(30);
+			// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
+
+			// Allow all UI interactions.
+			blockerImage.transform.gameObject.SetActive(false);
 		}
 		else                                                                                // If there are no more questions, the round ends
 		{
