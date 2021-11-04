@@ -77,9 +77,6 @@ public class PopupHandler : MonoBehaviour
 
     public void ReturnToMainMenuInterruptSafe()
     {
-
-        // add quizCode to sessionInterrupt.txt 
-
         UnityEngine.SceneManagement.SceneManager.LoadScene(0);
     }
 

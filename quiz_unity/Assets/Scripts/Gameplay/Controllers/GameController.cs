@@ -288,6 +288,7 @@ public class GameController : MonoBehaviour
 
 	public void EndRound()
 	{
+		jsonController.FlagSessionInterrupt(true);
 		isRoundActive = false;
 
 		dataController.SubmitNewScore(playerScore);
@@ -315,7 +316,6 @@ public class GameController : MonoBehaviour
 		*/ 
 
 		// At this points, the content of the JSON is what expected to be and there was no interruptions.
-		jsonController.FlagSessionInterrupt(true);
 
 		Debug.Log("Total time: " + quizClock.HHmmss());
 
@@ -360,9 +360,7 @@ public class GameController : MonoBehaviour
 		}
 		else                                                                                // If there are no more questions, the round ends
 		{
-
 			EndRound();
 		}
-
 	}
 }

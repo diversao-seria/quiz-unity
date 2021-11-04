@@ -27,8 +27,6 @@ public class DataController : MonoBehaviour
 
 	public StreamWriter activeQuizDataWriter = null;
 
-	
-
 	void Start()
 	{
 		DontDestroyOnLoad(gameObject);
@@ -72,9 +70,16 @@ public class DataController : MonoBehaviour
 		string filePath = Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerDataPath + gameDataFileName;
 		string playerDataFolder = Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerDataPath;
 
-		if (!Directory.Exists(playerDataFolder))
-        {
-			System.IO.Directory.CreateDirectory(Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerDataFolder);
+		try
+		{
+			if (!Directory.Exists(playerDataFolder))
+			{
+				System.IO.Directory.CreateDirectory(Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerDataFolder);
+			}
+		}
+		catch (IOException e)
+		{
+			Debug.Log(e + ". Caminho é arquivou ou armazenamento cheio.");
 		}
 
 		Debug.Log("path: " + filePath);
@@ -207,16 +212,6 @@ public class DataController : MonoBehaviour
 
 		activeQuizDataWriter.Write(text);
 	}
-
-	// Singleton
-	public FileStream GetStream(string path)
-    {
-		if(activeStream == null)
-        {
-			return new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
-		}
-		return activeStream;
-    }
 
 	public void CloseJSONFile()
     {
