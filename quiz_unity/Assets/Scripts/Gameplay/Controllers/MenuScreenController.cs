@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System;
 using System.IO;
 
@@ -20,6 +21,8 @@ public class MenuScreenController : MonoBehaviour
     private float transitionDelay = 1f;
     public EventSystem eventSystem;
 
+    private UserController userController;
+
     //experimental variables
     private int volume = 0;
     private int brightness = 0;
@@ -35,6 +38,11 @@ public class MenuScreenController : MonoBehaviour
         m_credits.onClick.AddListener(CreditsBehaviour);
 
         Load();
+        userController = GameObject.Find("UserController").GetComponent<UserController>();
+        if (!userController.loggedIn && !userController.isGuest)
+        {
+            SceneManager.LoadSceneAsync("Login", LoadSceneMode.Additive);
+        }
     }
 
     void Update()
