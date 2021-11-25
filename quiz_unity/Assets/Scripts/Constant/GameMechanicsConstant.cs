@@ -20,4 +20,6 @@ public static class GameMechanicsConstant
     public static readonly float IceAnimationTimeinSeconds = 1.5f;
     public static readonly float WindAnimationTimeinSeconds = 1.0f;
     public static readonly float LeafAnimationTimeinSeconds = 2.0f;
+
+    public static readonly float TimeToAnswerQuestion = 45.0f;
 }

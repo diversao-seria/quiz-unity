@@ -12,9 +12,11 @@ public static class DataManagementConstant
 
     // Folders
     public static readonly string PlayerDataFolder= "PlayerData";
-    public static readonly string QuizFolder = "Quizes"; 
+    public static readonly string QuizFolder = "Quizes";
+    public static readonly string InterruptFolder = "Interrupts";
 
     // >>>> Relative <<<< Paths
     public static readonly string PlayerDataPath = PlayerDataFolder + Path.AltDirectorySeparatorChar;
     public static readonly string QuizFolderRelativePath = QuizFolder + Path.AltDirectorySeparatorChar;
+    public static readonly string InterruptFolderPath = PlayerDataPath + InterruptFolder + Path.AltDirectorySeparatorChar;
 }

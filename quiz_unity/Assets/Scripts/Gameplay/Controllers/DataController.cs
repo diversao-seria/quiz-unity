@@ -17,6 +17,8 @@ public class DataController : MonoBehaviour
 
 	private PlayerProgress playerProgress;
 	private string gameDataFileName = "data.json";
+	public string SessionKeyFilename { get { return "sessionKey.txt"; } set { } }
+
 	private Quiz currentQuiz;
 	private string filenameJSON;
 
@@ -32,8 +34,30 @@ public class DataController : MonoBehaviour
 		DontDestroyOnLoad(gameObject);
 		LoadGameData();
 		LoadPlayerProgress();
+		CreateInterruptionFolder();
+
 		SceneManager.LoadScene("MenuScreen");
 		
+	}
+
+	private void CreateInterruptionFolder()
+    {
+		string path = Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.InterruptFolderPath;
+
+		Debug.Log("MyPath:" + path);
+
+		try
+		{
+			if (!Directory.Exists(path))
+			{
+				System.IO.Directory.CreateDirectory(path);
+			}
+		}
+		catch (IOException e)
+		{
+			Debug.Log(e + ". Caminho é arquivo ou armazenamento cheio.");
+		}
+
 	}
 
 	public void SubmitNewScore(int newScore)
@@ -261,4 +285,31 @@ public class DataController : MonoBehaviour
     {
 		return playerProgress.GetQuestionAnswers();
     }
+
+	public string generateSessionKey()
+    {
+		return Guid.NewGuid().ToString();
+    }
+
+	public bool noInterruptEntry(string sessionFilePath)
+    {
+		// First Entry
+		if (!File.Exists(sessionFilePath)) return true;
+
+		return false;
+    }
+
+    public void OnApplicationQuit()
+    {
+		Debug.Log("Jogador saiu no meio jogo!");
+    }
+
+	public int TimeDifferenceInSeconds(TimeStamp oldTimeStamp, TimeStamp newTimeStamp)
+	{
+		int oldTimeInSeconds = oldTimeStamp.Hours * 60 * 60 + oldTimeStamp.Minutes * 60 + oldTimeStamp.Seconds;
+		int newTimeInSeconds = newTimeStamp.Hours * 60 * 60 + newTimeStamp.Minutes * 60 + newTimeStamp.Seconds;
+
+		return newTimeInSeconds - oldTimeInSeconds;
+	}
+
 }

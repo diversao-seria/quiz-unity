@@ -23,8 +23,8 @@ public class InterruptChecker : MonoBehaviour
     public void RegisterInterrupt(string eventName)
     {
         // Paths for file and folder.
-        string pathToInterruptListFile = Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerDataPath + Path.AltDirectorySeparatorChar + interruptQuizListFileName;
         string playerDataFolder = Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerDataPath;
+        string pathToInterruptListFile = playerDataFolder+ Path.AltDirectorySeparatorChar + interruptQuizListFileName;
 
         // Check if folder where the file will be stored exists.
         try

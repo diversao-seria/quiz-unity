@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Schema;
 using System.IO;
-
+using System;
 
 public class GameController : MonoBehaviour
 {
@@ -43,6 +43,7 @@ public class GameController : MonoBehaviour
 	private List<GameObject> answerButtonGameObjects = new List<GameObject>();
 	private int streak = 0;
 	private int numberOfCorrectAnswers = 0;
+	private string gameSessionKey;
 
 	private QuestionClock questionClock;
 	private QuizClock quizClock;
@@ -50,6 +51,9 @@ public class GameController : MonoBehaviour
 
 	//public RuntimeAnimatorController certo,errado;
 	//private Animator animator;
+
+	DateTime beforeInterruptionTimeStamp;
+	DateTime backToForeground;
 
 	enum Clip : int
     {
@@ -64,6 +68,7 @@ public class GameController : MonoBehaviour
 		jsonController.SetNewQuizResultData();
 
 		dataController = FindObjectOfType<DataController>();        // Store a reference to the DataController so we can request the data we need for this round
+		gameSessionKey = dataController.generateSessionKey();
 
 		audioSource = gameObject.GetComponent<AudioSource>();
 		eventManager = GetComponent<EventManager>();
@@ -82,7 +87,7 @@ public class GameController : MonoBehaviour
 		powerUpController.SetJsonControllerReference(jsonController);
 
 		// questionClock = new QuestionClock(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
-		eventManager.QuestionClock = new QuestionClock(30);
+		eventManager.QuestionClock = new QuestionClock(GameMechanicsConstant.TimeToAnswerQuestion);
 		questionClock = eventManager.QuestionClock;
 
 		quizClock = new QuizClock(0);
@@ -160,7 +165,7 @@ public class GameController : MonoBehaviour
                         {
 							// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
 							StartCoroutine(powerUpController.PowerUpFolhaAnim());
-							questionClock.NewCountdown(30);
+							questionClock.NewCountdown(GameMechanicsConstant.TimeToAnswerQuestion);
 							eventManager.LetAnswerQuestion();
 							eventManager.ResetLastAnswerButton();
 							powerUpController.LeafPowerExpired();
@@ -235,7 +240,7 @@ public class GameController : MonoBehaviour
 				dataController.RetrieveQuiz().Questions[questionIndex].ID,
 				alternativeNumber,
 				isCorrect,
-				(int)(30 - questionClock.Time)
+				(int)(GameMechanicsConstant.TimeToAnswerQuestion - questionClock.Time)
 			);
 
 
@@ -244,7 +249,7 @@ public class GameController : MonoBehaviour
 
 
 		// Set Up for Next question;
-		jsonController.UpdateTotalTime((int)(30 - questionClock.Time));
+		jsonController.UpdateTotalTime((int)(GameMechanicsConstant.TimeToAnswerQuestion - questionClock.Time));
 
 		eventManager.resetTouchClock();
 		eventManager.resetSlider();
@@ -365,7 +370,7 @@ public class GameController : MonoBehaviour
 			eventManager.LetAnswerQuestion();
 
 			// New Countdown
-			questionClock.NewCountdown(30);
+			questionClock.NewCountdown(GameMechanicsConstant.TimeToAnswerQuestion);
 			// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
 
 			// Allow all UI interactions.
@@ -375,5 +380,73 @@ public class GameController : MonoBehaviour
 		{
 			EndRound();
 		}
+	}
+
+	public void OnApplicationPause(bool ScreenBackgroundStatus)
+	{
+		// Exiting to background
+		if(ScreenBackgroundStatus)
+        {
+			// Get CUrrent System Time
+			// beforeInterruptionTimeStamp = new TimeStamp(System.DateTime.Now.Hour, System.DateTime.Now.Minute, System.DateTime.Now.Second);
+			beforeInterruptionTimeStamp = DateTime.Now;
+			Debug.Log("BI" + beforeInterruptionTimeStamp.ToString());
+
+			// Paths for folder and file;
+			string interruptDataFolder = Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.InterruptFolderPath;
+			string sessionKeyFilePath = interruptDataFolder + Path.AltDirectorySeparatorChar + dataController.QuizCode + ".txt";
+
+			if (dataController.noInterruptEntry(sessionKeyFilePath))
+            {
+				// 1st insertion.
+				dataController.WriteOnPath(sessionKeyFilePath, beforeInterruptionTimeStamp.ToString() + " " + gameSessionKey);
+            }
+		}
+		else
+        {
+			// Game is back from backgroud. Obs: This block of code is never executed if user kills the game in background.
+
+			//backToForeground = new TimeStamp(System.DateTime.Now.Hour, System.DateTime.Now.Minute, System.DateTime.Now.Second);
+			backToForeground = DateTime.Now;
+			Debug.Log("BtF" + backToForeground.ToString());
+
+			TimeSpan stampDifference = backToForeground - beforeInterruptionTimeStamp;
+
+			Debug.Log("DIFF " + stampDifference.TotalSeconds.ToString()); ;
+			Debug.Log("DIFF (STAMP) " + stampDifference.ToString()); ;
+
+			if (stampDifference.Hours > 0 || stampDifference.Minutes > 0 || stampDifference.TotalSeconds > GameMechanicsConstant.TimeToAnswerQuestion - 1)
+            {
+				// Time's over;
+				questionClock.Reset();
+            }
+			else
+            {
+				// Decrease the time while in background.
+				questionClock.DecreaseTime(System.Math.Max(1.0f, (float) stampDifference.TotalSeconds));
+            }
+		}
+
+
+		// "4" FLAGS
+		// 1- IN GAME - BTackTOBeggining |
+		// 2 - SUSPENDED ACTIVITY        |  
+		// 3 - CLOSED THE GAME           | QUIZ CODE
+
+
+		// 1-> INTERRUPT IN GAME (DONE)
+
+		// 2-> BACKGROUND BUT DOESN'T CLOSE 
+		// true, keySaved | false,samekey, interruption
+		// Pegar o tempo e calcular -> descontar.
+		// 3-> BACKGROUNBD + CLOSE
+		// true, keysaved
+		// 1. Create SessionKeyFile if it doesn exist. (FOR POSSIBLE INTERRUPTS)
+		// QUIZ CODE | SessionKey
+		// 2. For data.
+		// QUIZ CODE | QuestionNumber -> How Many Interruptions TIL finish | TYPE (NO-INTERRUPT, INSIDE, EXTERNAL-NF, EXTERNAL)| 
+
+
+
 	}
 }
