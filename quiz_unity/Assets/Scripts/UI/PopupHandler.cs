@@ -8,6 +8,15 @@ public class PopupHandler : MonoBehaviour
     public GameObject screenController;
     public GameObject m_exitPopup;
     public GameObject m_errorPopup;
+
+    // Relevant in-game purpose
+    public GameController gameController;
+
+    public void Start()
+    {
+ 
+    }
+
     public void ExitGame()
     {
         Application.Quit();
@@ -77,6 +86,7 @@ public class PopupHandler : MonoBehaviour
 
     public void ReturnToMainMenuInterruptSafe()
     {
+        gameController.GetComponent<InterruptSubController>().RegisterInterrupt(GameMechanicsConstant.InterruptTypes.BackToMenu, false);
         UnityEngine.SceneManagement.SceneManager.LoadScene(0);
     }
 

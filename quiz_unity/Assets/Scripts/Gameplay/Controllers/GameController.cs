@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Schema;
 using System.IO;
-
+using System;
 
 public class GameController : MonoBehaviour
 {
@@ -31,6 +31,7 @@ public class GameController : MonoBehaviour
 	private PowerUpController powerUpController;
 	private AudioSource audioSource;
 	private EventManager eventManager;
+	private InterruptSubController interruptSubController;
 
 	private List<Question> questionPool;  // Question are going here.
 
@@ -43,6 +44,7 @@ public class GameController : MonoBehaviour
 	private List<GameObject> answerButtonGameObjects = new List<GameObject>();
 	private int streak = 0;
 	private int numberOfCorrectAnswers = 0;
+	private string gameSessionKey;
 
 	private QuestionClock questionClock;
 	private QuizClock quizClock;
@@ -50,6 +52,9 @@ public class GameController : MonoBehaviour
 
 	//public RuntimeAnimatorController certo,errado;
 	//private Animator animator;
+
+	DateTime beforeInterruptionTimeStamp;
+	DateTime backToForeground;
 
 	enum Clip : int
     {
@@ -67,6 +72,8 @@ public class GameController : MonoBehaviour
 
 		audioSource = gameObject.GetComponent<AudioSource>();
 		eventManager = GetComponent<EventManager>();
+		interruptSubController = GetComponent<InterruptSubController>();
+
 
 		currentRoundData = dataController.CurrentRoundData;                      // Ask the DataController for the data for the current round. At the moment, we only have one round - but we could extend this
 		questionPool = dataController.RetrieveQuiz().Questions;      // Take a copy of the questions so we could shuffle the pool or drop questions from it without affecting the original RoundData object
@@ -82,7 +89,7 @@ public class GameController : MonoBehaviour
 		powerUpController.SetJsonControllerReference(jsonController);
 
 		// questionClock = new QuestionClock(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
-		eventManager.QuestionClock = new QuestionClock(30);
+		eventManager.QuestionClock = new QuestionClock(GameMechanicsConstant.TimeToAnswerQuestion);
 		questionClock = eventManager.QuestionClock;
 
 		quizClock = new QuizClock(0);
@@ -160,7 +167,7 @@ public class GameController : MonoBehaviour
                         {
 							// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
 							StartCoroutine(powerUpController.PowerUpFolhaAnim());
-							questionClock.NewCountdown(30);
+							questionClock.NewCountdown(GameMechanicsConstant.TimeToAnswerQuestion);
 							eventManager.LetAnswerQuestion();
 							eventManager.ResetLastAnswerButton();
 							powerUpController.LeafPowerExpired();
@@ -235,7 +242,7 @@ public class GameController : MonoBehaviour
 				dataController.RetrieveQuiz().Questions[questionIndex].ID,
 				alternativeNumber,
 				isCorrect,
-				(int)(30 - questionClock.Time)
+				(int)(GameMechanicsConstant.TimeToAnswerQuestion - questionClock.Time)
 			);
 
 
@@ -244,7 +251,7 @@ public class GameController : MonoBehaviour
 
 
 		// Set Up for Next question;
-		jsonController.UpdateTotalTime((int)(30 - questionClock.Time));
+		jsonController.UpdateTotalTime((int)(GameMechanicsConstant.TimeToAnswerQuestion - questionClock.Time));
 
 		eventManager.resetTouchClock();
 		eventManager.resetSlider();
@@ -365,7 +372,7 @@ public class GameController : MonoBehaviour
 			eventManager.LetAnswerQuestion();
 
 			// New Countdown
-			questionClock.NewCountdown(30);
+			questionClock.NewCountdown(GameMechanicsConstant.TimeToAnswerQuestion);
 			// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
 
 			// Allow all UI interactions.
@@ -376,4 +383,78 @@ public class GameController : MonoBehaviour
 			EndRound();
 		}
 	}
+
+	public void OnApplicationPause(bool ScreenBackgroundStatus)
+	{
+		// Only relevant when a Quiz is being played.
+		if (!FindObjectOfType<GameController>()) return;
+
+		// Exiting to background
+		if (ScreenBackgroundStatus)
+		{
+			// Get CUrrent System Time
+			// beforeInterruptionTimeStamp = new TimeStamp(System.DateTime.Now.Hour, System.DateTime.Now.Minute, System.DateTime.Now.Second);
+			interruptSubController.BeforeInterruptionTimeStamp = DateTime.Now;
+			Debug.Log("BI" + interruptSubController.BeforeInterruptionTimeStamp.ToString());
+
+			// Paths for folder and file;
+			string interruptDataFolder = Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.InterruptFolderPath;
+			string sessionKeyFilePath = interruptDataFolder + Path.AltDirectorySeparatorChar + dataController.QuizCode + ".txt";
+
+			if (!File.Exists(sessionKeyFilePath))
+			{
+				// 1st insertion.
+				dataController.WriteOnPath(sessionKeyFilePath, interruptSubController.BeforeInterruptionTimeStamp.ToString() + " " + gameSessionKey);
+			}
+
+			interruptSubController.RegisterInterrupt(GameMechanicsConstant.InterruptTypes.BackgroundToForegroud, true);
+		}
+		else
+		{
+			// Game is back from backgroud. Obs: This block of code is never executed if user kills the game in background.
+
+			interruptSubController.BackToForegroundTimeStamp = DateTime.Now;
+			Debug.Log("BtF" + interruptSubController.BackToForegroundTimeStamp.ToString());
+
+			TimeSpan stampDifference = interruptSubController.BackToForegroundTimeStamp - interruptSubController.BeforeInterruptionTimeStamp;
+
+			Debug.Log("DIFF " + stampDifference.TotalSeconds.ToString()); ;
+			Debug.Log("DIFF (STAMP) " + stampDifference.ToString()); ;
+
+			if (stampDifference.Hours > 0 || stampDifference.Minutes > 0 || stampDifference.TotalSeconds > GameMechanicsConstant.TimeToAnswerQuestion - 1)
+			{
+				// Time's over;
+				questionClock.Reset();
+			}
+			else
+			{
+				// Decrease the time while in background.
+				questionClock.DecreaseTime(System.Math.Max(1.0f, (float)stampDifference.TotalSeconds));
+			}
+
+			// Register Interruption Type
+			interruptSubController.RegisterInterrupt(GameMechanicsConstant.InterruptTypes.BackgroundToForegroud, false);
+		}
+	}
+
+	// "4" FLAGS
+	// 1- IN GAME - BTackTOBeggining |
+	// 2 - SUSPENDED ACTIVITY        |  
+	// 3 - CLOSED THE GAME           | QUIZ CODE
+
+
+	// 1-> INTERRUPT IN GAME (DONE)
+
+	// 2-> BACKGROUND BUT DOESN'T CLOSE 
+	// true, keySaved | false,samekey, interruption
+	// Pegar o tempo e calcular -> descontar.
+	// 3-> BACKGROUNBD + CLOSE
+	// true, keysaved
+	// 1. Create SessionKeyFile if it doesn exist. (FOR POSSIBLE INTERRUPTS)
+	// QUIZ CODE | SessionKey
+	// 2. For data.
+	// QUIZ CODE | QuestionNumber -> How Many Interruptions TIL finish | TYPE (NO-INTERRUPT, INSIDE, EXTERNAL-NF, EXTERNAL)| 
+
+
+
 }

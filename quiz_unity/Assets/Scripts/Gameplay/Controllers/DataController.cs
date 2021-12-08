@@ -12,11 +12,14 @@ public class DataController : MonoBehaviour
 {
 	public RoundData CurrentRoundData { get; set; }
 	public NetController netController;
+	public InterruptSubController interruptSubController;
 
 	public string QuizCode { get; set; }
 
 	private PlayerProgress playerProgress;
 	private string gameDataFileName = "data.json";
+	public string SessionKeyFilename { get { return "sessionKey.txt"; } set { } }
+
 	private Quiz currentQuiz;
 	private string filenameJSON;
 
@@ -27,13 +30,48 @@ public class DataController : MonoBehaviour
 
 	public StreamWriter activeQuizDataWriter = null;
 
+	private string _dataSessionKey;
+
+	public string DataSessionKey
+	{
+		get
+		{
+			return _dataSessionKey;
+		}
+	}
+
+
 	void Start()
 	{
 		DontDestroyOnLoad(gameObject);
+		_dataSessionKey = generateSessionKey();
+		interruptSubController = GetComponent<InterruptSubController>();
 		LoadGameData();
 		LoadPlayerProgress();
+		CreateInterruptionFolder();
+
 		SceneManager.LoadScene("MenuScreen");
-		
+
+	}
+
+	private void CreateInterruptionFolder()
+	{
+		string path = Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.InterruptFolderPath;
+
+		Debug.Log("MyPath:" + path);
+
+		try
+		{
+			if (!Directory.Exists(path))
+			{
+				System.IO.Directory.CreateDirectory(path);
+			}
+		}
+		catch (IOException e)
+		{
+			Debug.Log(e + ". Caminho é arquivo ou armazenamento cheio.");
+		}
+
 	}
 
 	public void SubmitNewScore(int newScore)
@@ -88,7 +126,7 @@ public class DataController : MonoBehaviour
 	// Didn't come with the example.
 
 	public void CreateDirectoryFromPath(string path, string text)
-    {
+	{
 		// Get the current path for application
 		string currentPath = Application.persistentDataPath;
 
@@ -141,7 +179,7 @@ public class DataController : MonoBehaviour
 			// This exception is thrown if there is no quiz folder.
 			Debug.Log(dirE.GetType().Name + ".\n Caminho não existente. Criando...");
 
-			CreateDirectoryFromPath(path,text);
+			CreateDirectoryFromPath(path, text);
 		}
 		catch (IOException ioE)
 		{
@@ -155,9 +193,9 @@ public class DataController : MonoBehaviour
 
 	// Singleton
 	public void SetJSONWriter(string path, string text)
-    {
+	{
 
-        try 
+		try
 		{
 			if (activeStream == null)
 			{
@@ -167,7 +205,7 @@ public class DataController : MonoBehaviour
 			{
 				activeQuizDataWriter = new StreamWriter(activeStream, Encoding.UTF8); ;
 			}
-		// TO DO:  Feedback Visual.
+			// TO DO:  Feedback Visual.
 		}
 		catch (DirectoryNotFoundException dirE)
 		{
@@ -184,17 +222,17 @@ public class DataController : MonoBehaviour
 	}
 
 	public void SetCurrentSessionPath(string currentQuizPlayerDataPath)
-    {
+	{
 		this.currentQuizPlayerDataPath = currentQuizPlayerDataPath;
-    }
+	}
 
 	public void UpdateJSONPlayerData(string text)
-    {
+	{
 		try
 		{
-				activeStream = new FileStream(currentQuizPlayerDataPath, FileMode.Create, FileAccess.Write, FileShare.None);
-				activeQuizDataWriter = new StreamWriter(activeStream, Encoding.UTF8); 
-			
+			activeStream = new FileStream(currentQuizPlayerDataPath, FileMode.Create, FileAccess.Write, FileShare.None);
+			activeQuizDataWriter = new StreamWriter(activeStream, Encoding.UTF8);
+
 			// TO DO:  Feedback Visual.
 		}
 		catch (DirectoryNotFoundException dirE)
@@ -214,7 +252,7 @@ public class DataController : MonoBehaviour
 	}
 
 	public void CloseJSONFile()
-    {
+	{
 		activeQuizDataWriter.Close();
 		activeStream.Close();
 		activeQuizDataWriter = null;
@@ -223,7 +261,7 @@ public class DataController : MonoBehaviour
 
 	// Populate all relevant classes with the JSON provided.
 	public void PreLoadQuiz(string quizCode)
-    {
+	{
 		QuizCode = quizCode;
 		filenameJSON = quizCode + ".json";
 
@@ -253,12 +291,31 @@ public class DataController : MonoBehaviour
 	}
 
 	public void TrackQuestionsAnswers(int n)
-    {
+	{
 		playerProgress.questionAnswers = new QuestionAnswer(n);
-    }
+	}
 
 	public QuestionAnswer GetQuestionAnswers()
-    {
+	{
 		return playerProgress.GetQuestionAnswers();
-    }
+	}
+
+	public string generateSessionKey()
+	{
+		return Guid.NewGuid().ToString();
+	}
+
+	public void OnApplicationQuit()
+	{
+		Debug.Log("Jogador saiu no meio jogo!");
+	}
+
+	public int TimeDifferenceInSeconds(TimeStamp oldTimeStamp, TimeStamp newTimeStamp)
+	{
+		int oldTimeInSeconds = oldTimeStamp.Hours * 60 * 60 + oldTimeStamp.Minutes * 60 + oldTimeStamp.Seconds;
+		int newTimeInSeconds = newTimeStamp.Hours * 60 * 60 + newTimeStamp.Minutes * 60 + newTimeStamp.Seconds;
+
+		return newTimeInSeconds - oldTimeInSeconds;
+	}
 }
+
