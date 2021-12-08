@@ -31,6 +31,7 @@ public class GameController : MonoBehaviour
 	private PowerUpController powerUpController;
 	private AudioSource audioSource;
 	private EventManager eventManager;
+	private InterruptSubController interruptSubController;
 
 	private List<Question> questionPool;  // Question are going here.
 
@@ -68,10 +69,11 @@ public class GameController : MonoBehaviour
 		jsonController.SetNewQuizResultData();
 
 		dataController = FindObjectOfType<DataController>();        // Store a reference to the DataController so we can request the data we need for this round
-		gameSessionKey = dataController.generateSessionKey();
 
 		audioSource = gameObject.GetComponent<AudioSource>();
 		eventManager = GetComponent<EventManager>();
+		interruptSubController = GetComponent<InterruptSubController>();
+
 
 		currentRoundData = dataController.CurrentRoundData;                      // Ask the DataController for the data for the current round. At the moment, we only have one round - but we could extend this
 		questionPool = dataController.RetrieveQuiz().Questions;      // Take a copy of the questions so we could shuffle the pool or drop questions from it without affecting the original RoundData object
@@ -384,69 +386,75 @@ public class GameController : MonoBehaviour
 
 	public void OnApplicationPause(bool ScreenBackgroundStatus)
 	{
+		// Only relevant when a Quiz is being played.
+		if (!FindObjectOfType<GameController>()) return;
+
 		// Exiting to background
-		if(ScreenBackgroundStatus)
-        {
+		if (ScreenBackgroundStatus)
+		{
 			// Get CUrrent System Time
 			// beforeInterruptionTimeStamp = new TimeStamp(System.DateTime.Now.Hour, System.DateTime.Now.Minute, System.DateTime.Now.Second);
-			beforeInterruptionTimeStamp = DateTime.Now;
-			Debug.Log("BI" + beforeInterruptionTimeStamp.ToString());
+			interruptSubController.BeforeInterruptionTimeStamp = DateTime.Now;
+			Debug.Log("BI" + interruptSubController.BeforeInterruptionTimeStamp.ToString());
 
 			// Paths for folder and file;
 			string interruptDataFolder = Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.InterruptFolderPath;
 			string sessionKeyFilePath = interruptDataFolder + Path.AltDirectorySeparatorChar + dataController.QuizCode + ".txt";
 
-			if (dataController.noInterruptEntry(sessionKeyFilePath))
-            {
+			if (!File.Exists(sessionKeyFilePath))
+			{
 				// 1st insertion.
-				dataController.WriteOnPath(sessionKeyFilePath, beforeInterruptionTimeStamp.ToString() + " " + gameSessionKey);
-            }
+				dataController.WriteOnPath(sessionKeyFilePath, interruptSubController.BeforeInterruptionTimeStamp.ToString() + " " + gameSessionKey);
+			}
+
+			interruptSubController.RegisterInterrupt(GameMechanicsConstant.InterruptTypes.BackgroundToForegroud, true);
 		}
 		else
-        {
+		{
 			// Game is back from backgroud. Obs: This block of code is never executed if user kills the game in background.
 
-			//backToForeground = new TimeStamp(System.DateTime.Now.Hour, System.DateTime.Now.Minute, System.DateTime.Now.Second);
-			backToForeground = DateTime.Now;
-			Debug.Log("BtF" + backToForeground.ToString());
+			interruptSubController.BackToForegroundTimeStamp = DateTime.Now;
+			Debug.Log("BtF" + interruptSubController.BackToForegroundTimeStamp.ToString());
 
-			TimeSpan stampDifference = backToForeground - beforeInterruptionTimeStamp;
+			TimeSpan stampDifference = interruptSubController.BackToForegroundTimeStamp - interruptSubController.BeforeInterruptionTimeStamp;
 
 			Debug.Log("DIFF " + stampDifference.TotalSeconds.ToString()); ;
 			Debug.Log("DIFF (STAMP) " + stampDifference.ToString()); ;
 
 			if (stampDifference.Hours > 0 || stampDifference.Minutes > 0 || stampDifference.TotalSeconds > GameMechanicsConstant.TimeToAnswerQuestion - 1)
-            {
+			{
 				// Time's over;
 				questionClock.Reset();
-            }
+			}
 			else
-            {
+			{
 				// Decrease the time while in background.
-				questionClock.DecreaseTime(System.Math.Max(1.0f, (float) stampDifference.TotalSeconds));
-            }
+				questionClock.DecreaseTime(System.Math.Max(1.0f, (float)stampDifference.TotalSeconds));
+			}
+
+			// Register Interruption Type
+			interruptSubController.RegisterInterrupt(GameMechanicsConstant.InterruptTypes.BackgroundToForegroud, false);
 		}
-
-
-		// "4" FLAGS
-		// 1- IN GAME - BTackTOBeggining |
-		// 2 - SUSPENDED ACTIVITY        |  
-		// 3 - CLOSED THE GAME           | QUIZ CODE
-
-
-		// 1-> INTERRUPT IN GAME (DONE)
-
-		// 2-> BACKGROUND BUT DOESN'T CLOSE 
-		// true, keySaved | false,samekey, interruption
-		// Pegar o tempo e calcular -> descontar.
-		// 3-> BACKGROUNBD + CLOSE
-		// true, keysaved
-		// 1. Create SessionKeyFile if it doesn exist. (FOR POSSIBLE INTERRUPTS)
-		// QUIZ CODE | SessionKey
-		// 2. For data.
-		// QUIZ CODE | QuestionNumber -> How Many Interruptions TIL finish | TYPE (NO-INTERRUPT, INSIDE, EXTERNAL-NF, EXTERNAL)| 
-
-
-
 	}
+
+	// "4" FLAGS
+	// 1- IN GAME - BTackTOBeggining |
+	// 2 - SUSPENDED ACTIVITY        |  
+	// 3 - CLOSED THE GAME           | QUIZ CODE
+
+
+	// 1-> INTERRUPT IN GAME (DONE)
+
+	// 2-> BACKGROUND BUT DOESN'T CLOSE 
+	// true, keySaved | false,samekey, interruption
+	// Pegar o tempo e calcular -> descontar.
+	// 3-> BACKGROUNBD + CLOSE
+	// true, keysaved
+	// 1. Create SessionKeyFile if it doesn exist. (FOR POSSIBLE INTERRUPTS)
+	// QUIZ CODE | SessionKey
+	// 2. For data.
+	// QUIZ CODE | QuestionNumber -> How Many Interruptions TIL finish | TYPE (NO-INTERRUPT, INSIDE, EXTERNAL-NF, EXTERNAL)| 
+
+
+
 }

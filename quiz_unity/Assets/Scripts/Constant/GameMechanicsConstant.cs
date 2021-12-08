@@ -12,6 +12,13 @@ public static class GameMechanicsConstant
         Air = 2
     }
 
+    public enum InterruptTypes
+    { 
+        BackToMenu = 0,
+        BackgroundToForegroud = 1,
+        BackgroundAndKill = 2
+    }
+
     public static readonly int PowerUpCount = Enum.GetNames(typeof(PowerUpNames)).Length;
 
     public static readonly float AnswerConfirmationTimeinSeconds = 2.0f;

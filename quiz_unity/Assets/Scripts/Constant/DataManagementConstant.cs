@@ -6,6 +6,13 @@ using UnityEngine;
 // All paths're relative!
 public static class DataManagementConstant 
 {
+    public enum SessionDataInterruptInformation
+    {
+        TimeStamp = 0,
+        SessionKey = 1,
+        InterruptionsActivated = 2,
+    }
+
     // Files
     public static readonly string PlayerQuizDataFile = "QuizAnswerData.json";
     public static readonly string UserSettingsFile = "settings.json";
