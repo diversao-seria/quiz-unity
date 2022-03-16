@@ -23,13 +23,17 @@ public class PreGameController : MonoBehaviour
     public GameObject fadeMask;
     public GameObject textProgressObject;
 
+    public LoadingScreenGame loadingScreenGame;
+
     private UnityWebRequest www;
 
     void Awake()
     {
         m_startButton.onClick.AddListener(CheckForQuiz);
         dataController = FindObjectOfType<DataController>();
-        netController = FindObjectOfType<NetController>();      
+        netController = FindObjectOfType<NetController>();
+
+        loadingScreenGame = new LoadingScreenGame(spinner,fadeMask,downloadProgess);
     }
 
     void Start()
@@ -48,16 +52,10 @@ public class PreGameController : MonoBehaviour
         // put quizcode on upper case
         string quizCode = inputText.GetComponent<Text>().text.ToUpper();
 
-
-
-
-
         StartCoroutine(GetFile(quizCode));
 
         // Net Controller Search routine.
         netController.GetComponent<NetController>().RequestQuiz(quizCode);
-
-        
     }
 
     private bool isQuizAvailable(string quizCode)
@@ -96,7 +94,7 @@ public class PreGameController : MonoBehaviour
         using (www = UnityWebRequest.Get(url))
         {
             www.timeout = 10;
-            EnableLoadingUI();
+            loadingScreenGame.EnableLoadingGUI();
 
             //yield return www.SendWebRequest();
             www.SendWebRequest();
@@ -104,8 +102,7 @@ public class PreGameController : MonoBehaviour
             while(!www.isDone)
             {
                 // DOwnload PRogess
-                var progressValue = www.downloadProgress * 100;
-                textProgressObject.GetComponent<Text>().text = progressValue.ToString() + "%";
+                loadingScreenGame.UpdateDownloadProgress(www.downloadProgress * 100 + "%");
                 //textProgressObject
                 yield return null;
             }
@@ -121,7 +118,7 @@ public class PreGameController : MonoBehaviour
                 // If the quiz is valid, a json data will be returned.
                 if (!www.downloadHandler.text.Equals("null"))
                 {
-                    textProgressObject.GetComponent<Text>().text = "100%";
+                    loadingScreenGame.UpdateDownloadProgress("100%");
                     // Build path quiz directory
                     string path = Application.persistentDataPath + Path.AltDirectorySeparatorChar
                         + DataManagementConstant.QuizFolderRelativePath + quizCode + ".json";
@@ -142,38 +139,10 @@ public class PreGameController : MonoBehaviour
             else
             {
                 Debug.Log(errorText);
-                DisableLoadingUI();
+                loadingScreenGame.DisableLoadingGUI();
                 errorController.GetComponent<PopupHandler>().InitialExitBehaviour("error");               
             }
         }
-    }
-
-    private void EnableLoadingUI()
-    {
-        spinner.transform.gameObject.SetActive(true);
-        spinner.transform.GetComponentInChildren<Transform>();
-        foreach (Transform spinnerPart in spinner.transform.GetComponentInChildren<Transform>())
-        {
-            Debug.Log("nome do objeto: " + spinnerPart.gameObject.name);
-            spinnerPart.gameObject.SetActive(true);
-        }
-
-        downloadProgess.gameObject.SetActive(true);
-        fadeMask.gameObject.SetActive(true);
-    }
-
-    private void DisableLoadingUI()
-    {
-        foreach (Transform spinnerPart in spinner.transform.GetComponentInChildren<Transform>())
-        {
-            Debug.Log("nome do objeto: " + spinnerPart.gameObject.name);
-            spinnerPart.gameObject.SetActive(false);
-        }
-        spinner.transform.gameObject.SetActive(false);
-
-
-        downloadProgess.gameObject.SetActive(false);
-        fadeMask.gameObject.SetActive(false);
     }
 
     void SetUpRoundData(string quizCode)

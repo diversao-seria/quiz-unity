@@ -33,6 +33,8 @@ public class GameController : MonoBehaviour
 	private EventManager eventManager;
 	private InterruptSubController interruptSubController;
 
+	private LoadingScreenGame loadingScreenGame;
+
 	private List<Question> questionPool;  // Question are going here.
 
 	private bool isRoundActive = false;
@@ -330,7 +332,13 @@ public class GameController : MonoBehaviour
 									DataManagementConstant.PlayerQuizDataFile, jsonController.SerializeAnswerData());
 		*/ 
 
-		// At this points, the content of the JSON is what expected to be and there was no interruptions.
+		// At this point, the content of the JSON is what expected to be and there was no interruptions.
+
+		// darken screen
+		// SEnd data
+		// success or failure
+
+
 
 		Debug.Log("Total time: " + quizClock.HHmmss());
 
