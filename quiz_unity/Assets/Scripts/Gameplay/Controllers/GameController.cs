@@ -58,6 +58,7 @@ public class GameController : MonoBehaviour
 	private QuestionClock questionClock;
 	private QuizClock quizClock;
 	private Clock freezeClock;
+	private string serverURL = "http://ds-quiz.herokuapp.com/matches";
 
 	//public RuntimeAnimatorController certo,errado;
 	//private Animator animator;
@@ -321,25 +322,9 @@ public class GameController : MonoBehaviour
 		questionDisplay.SetActive(false);
 		roundEndDisplay.SetActive(true);
 
-		// string folderPath = currentRoundData.FolderPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerQuizDataFile;
-		// jsonController.DEBUGPlayerJSONData();
-
-		/*
-		if (File.Exists(quizPlayerDataPath))
-		{
-			File.Delete(folderPath); 
-		}
-		*/
-
 		jsonController.UpdateScore(playerScore);
 
-		// WIP: Writing must be done for each question
-		/* dataController.WriteOnPath(currentRoundData.FolderPath + 
-								   Path.AltDirectorySeparatorChar + 
-									DataManagementConstant.PlayerQuizDataFile, jsonController.SerializeAnswerData());
-		*/
 
-		// At this point, the content of the JSON is what expected to be and there was no interruptions.
 
 
 		// darken screen
@@ -347,7 +332,6 @@ public class GameController : MonoBehaviour
 		// success or failure
 
 		StartCoroutine(SendForm(dataController.QuizCode));
-		StartCoroutine(LoadResults()) ;
 
 		// TO DO: success or failure
 		Debug.Log("Total time: " + quizClock.HHmmss());
@@ -363,31 +347,32 @@ public class GameController : MonoBehaviour
 	IEnumerator SendForm(string quizCode)
 	{
 
-		string url = "http://ds-quiz.herokuapp.com/matches";
+		Debug.Log("Antes FOrm");
 
-		// List<IMultipartFormSection> formData = new List<IMultipartFormSection>();
-		// formData.Add(new MultipartFormDataSection("ID=" + exampleID.ToString() + "&" + "TemponoQuiz=" + exampleTime + "&" + "RespostasCorretas=" + exampleCorrect.ToString()));
-		// formData.Add(new MultipartFormFileSection("my file data", pathToMatchData));
-
-		string pathToQuizResult = Path.Combine(Application.persistentDataPath + Path.AltDirectorySeparatorChar +
-			DataManagementConstant.PlayerDataPath + quizCode + Path.AltDirectorySeparatorChar + "QuizAnswerData" + ".json");
-
-		string jsonData = null;
-
-		loadingScreenGame = new LoadingScreenGame(spinner, fadeMask, textProgressObject);
-
-		try
+		using (UnityWebRequest www = UnityWebRequest.Post(serverURL, "POST"))
 		{
-			jsonData = System.IO.File.ReadAllText(pathToQuizResult);
-		}
-		catch (IOException e)
-		{
-			Debug.Log(e);
-		}
 
 
-		using (UnityWebRequest www = UnityWebRequest.Post(url, "POST"))
-		{
+			// List<IMultipartFormSection> formData = new List<IMultipartFormSection>();
+			// formData.Add(new MultipartFormDataSection("ID=" + exampleID.ToString() + "&" + "TemponoQuiz=" + exampleTime + "&" + "RespostasCorretas=" + exampleCorrect.ToString()));
+			// formData.Add(new MultipartFormFileSection("my file data", pathToMatchData));
+
+			string pathToQuizResult = Path.Combine(Application.persistentDataPath + Path.AltDirectorySeparatorChar +
+				DataManagementConstant.PlayerDataPath + quizCode + Path.AltDirectorySeparatorChar + "QuizAnswerData" + ".json");
+
+			string jsonData = null;
+
+			loadingScreenGame = new LoadingScreenGame(spinner, fadeMask, textProgressObject);
+
+			try
+			{
+				jsonData = System.IO.File.ReadAllText(pathToQuizResult);
+			}
+			catch (IOException e)
+			{
+				Debug.Log(e);
+			}
+
 			www.timeout = 10;
 
 			loadingScreenGame.EnableLoadingGUI();
@@ -423,16 +408,7 @@ public class GameController : MonoBehaviour
 				Debug.Log("Form upload complete!");
 			}
 		}
-
-		isSendingDataFinished = true;
-	}
-
-	IEnumerator LoadResults()
-    {
-		while(!isSendingDataFinished)
-        {
-			yield return null;
-        }
+		Debug.Log("Depois Form");
 		SceneManager.LoadScene("QuizResult");
 	}
 

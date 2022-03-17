@@ -37,6 +37,7 @@ public class ResultGameController : MonoBehaviour
 
     void Awake()
     {
+        Debug.Log("Começide QUizResult");
         dataFormisDone = false;
         leftStar = starWrapper.transform.Find("LeftStar").gameObject;
         centralStar = starWrapper.transform.Find("CentralStar").gameObject;
