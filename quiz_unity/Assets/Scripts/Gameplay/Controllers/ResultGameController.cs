@@ -50,7 +50,7 @@ public class ResultGameController : MonoBehaviour
     void Start()
     {
         ShowPlayerAnswers();
-        SendPlayerData(dataController.QuizCode);
+        //SendPlayerData(dataController.QuizCode);
     }
 
     // Update is called once per frame

@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Xml.Schema;
 using System.IO;
 using System;
+using UnityEngine.Networking;
+using System.Text;
 
 public class GameController : MonoBehaviour
 {
@@ -25,6 +27,10 @@ public class GameController : MonoBehaviour
 	public Image blockerImage;
 	public GameObject exitPopUp;
 
+	public GameObject spinner;
+	public GameObject fadeMask;
+	public Text textProgressObject;
+
 	private DataController dataController;
 	private RoundData currentRoundData;
 	private JsonController jsonController;
@@ -38,6 +44,7 @@ public class GameController : MonoBehaviour
 	private List<Question> questionPool;  // Question are going here.
 
 	private bool isRoundActive = false;
+	private bool isSendingDataFinished = false;
 	public bool isQuestionAnswered = false;
 
 	private List<string> sequencia_atuacao = new List<string>();
@@ -330,24 +337,103 @@ public class GameController : MonoBehaviour
 		/* dataController.WriteOnPath(currentRoundData.FolderPath + 
 								   Path.AltDirectorySeparatorChar + 
 									DataManagementConstant.PlayerQuizDataFile, jsonController.SerializeAnswerData());
-		*/ 
+		*/
 
 		// At this point, the content of the JSON is what expected to be and there was no interruptions.
+
 
 		// darken screen
 		// SEnd data
 		// success or failure
 
+		StartCoroutine(SendForm(dataController.QuizCode));
+		StartCoroutine(LoadResults()) ;
 
-
+		// TO DO: success or failure
 		Debug.Log("Total time: " + quizClock.HHmmss());
-
-		SceneManager.LoadScene("QuizResult");
 	}
+
+
 
 	public void ReturnToMenu()
 	{
 		SceneManager.LoadScene("MenuScreen");
+	}
+
+	IEnumerator SendForm(string quizCode)
+	{
+
+		string url = "http://ds-quiz.herokuapp.com/matches";
+
+		// List<IMultipartFormSection> formData = new List<IMultipartFormSection>();
+		// formData.Add(new MultipartFormDataSection("ID=" + exampleID.ToString() + "&" + "TemponoQuiz=" + exampleTime + "&" + "RespostasCorretas=" + exampleCorrect.ToString()));
+		// formData.Add(new MultipartFormFileSection("my file data", pathToMatchData));
+
+		string pathToQuizResult = Path.Combine(Application.persistentDataPath + Path.AltDirectorySeparatorChar +
+			DataManagementConstant.PlayerDataPath + quizCode + Path.AltDirectorySeparatorChar + "QuizAnswerData" + ".json");
+
+		string jsonData = null;
+
+		loadingScreenGame = new LoadingScreenGame(spinner, fadeMask, textProgressObject);
+
+		try
+		{
+			jsonData = System.IO.File.ReadAllText(pathToQuizResult);
+		}
+		catch (IOException e)
+		{
+			Debug.Log(e);
+		}
+
+
+		using (UnityWebRequest www = UnityWebRequest.Post(url, "POST"))
+		{
+			www.timeout = 10;
+
+			loadingScreenGame.EnableLoadingGUI();
+
+			// Form Data
+			byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
+			www.SetRequestHeader("Content-Type", "application/json");
+			www.uploadHandler = (UploadHandler) new UploadHandlerRaw(bodyRaw);
+			www.SendWebRequest();
+
+			while (!www.isDone)
+			{
+				loadingScreenGame.UpdateDownloadProgress(www.downloadProgress * 100 + "%");
+				yield return null;
+			}
+
+			Debug.Log("Status Code: " + www.responseCode);
+			loadingScreenGame.DisableLoadingGUI();
+
+			if (www.result != UnityWebRequest.Result.Success)
+			{
+				// Sem internet -> 0
+
+
+				Debug.Log(www.error);
+				Debug.Log(www.downloadHandler.text);
+				// TO DO - JANELA.
+
+			}
+			else
+			{
+				loadingScreenGame.UpdateDownloadProgress("100%");
+				Debug.Log("Form upload complete!");
+			}
+		}
+
+		isSendingDataFinished = true;
+	}
+
+	IEnumerator LoadResults()
+    {
+		while(!isSendingDataFinished)
+        {
+			yield return null;
+        }
+		SceneManager.LoadScene("QuizResult");
 	}
 
 	IEnumerator VisualFeedback(bool isCorrect)
