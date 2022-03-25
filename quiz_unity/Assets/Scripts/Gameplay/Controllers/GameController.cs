@@ -334,6 +334,8 @@ public class GameController : MonoBehaviour
 		StartCoroutine(SendForm(dataController.QuizCode));
 
 		// TO DO: success or failure
+		Debug.Log("isRoundactive: " + isRoundActive + " e isQuestionAnswered: " + isQuestionAnswered);
+		// isROundActivemustBefalse Here
 		Debug.Log("Total time: " + quizClock.HHmmss());
 	}
 
@@ -407,6 +409,10 @@ public class GameController : MonoBehaviour
 				loadingScreenGame.UpdateDownloadProgress("100%");
 				Debug.Log("Form upload complete!");
 			}
+
+			www.downloadHandler.Dispose();
+			www.uploadHandler.Dispose();
+			www.Dispose();
 		}
 		Debug.Log("Depois Form");
 		SceneManager.LoadScene("QuizResult");

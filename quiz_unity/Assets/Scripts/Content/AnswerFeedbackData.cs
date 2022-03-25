@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AnswerFeedbackData : ScriptableObject
+public class AnswerFeedbackData 
 {
     public Color BackgroundColor { get; set; }
     public Color LabelColor { get; set; }
