@@ -323,6 +323,10 @@ public class LoginController : MonoBehaviour
                 }
                 LoginSuccess();
             }
+
+            www.downloadHandler.Dispose();
+            www.uploadHandler.Dispose();
+            www.Dispose();
         }
     }
 
