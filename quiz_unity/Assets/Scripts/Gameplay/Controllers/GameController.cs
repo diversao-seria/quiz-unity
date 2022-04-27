@@ -150,43 +150,36 @@ public class GameController : MonoBehaviour
 
 			UpdateTimeRemainingDisplay(questionClock);
 
-			if (questionClock.Time <= 0.0f)                                                        // If timeRemaining is 0 or less, the round ends
+			// Time is up!
+			if (questionClock.Time <= 0.0f)                                                        
 			{
-				if (questionIndex == questionPool.Count - 1)
-				{
-					EndRound();
+				isQuestionAnswered = true;
+				eventManager.LockAnswer();
+
+				if(eventManager.GetAnswerButton() && eventManager.TouchLastStatus())
+                {
+					if (powerUpController.leafImmunity)
+                    {
+						 eventManager.resetTouchClock();
+						 eventManager.resetSlider();
+                    }
+					eventManager.GetAnswerButton().HandleClick(questionClock);
 				}
 				else
-				{
-					isQuestionAnswered = true;
-					eventManager.LockAnswer();
-
-					if(eventManager.GetAnswerButton() && eventManager.TouchLastStatus())
+                {
+					if(powerUpController.leafImmunity)
                     {
-
-						if (powerUpController.leafImmunity)
-                        {
-							eventManager.resetTouchClock();
-							eventManager.resetSlider();
-                        }
-						eventManager.GetAnswerButton().HandleClick(questionClock);
+							// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
+						StartCoroutine(powerUpController.PowerUpFolhaAnim());
+						questionClock.NewCountdown(GameMechanicsConstant.TimeToAnswerQuestion);
+						eventManager.LetAnswerQuestion();
+						eventManager.ResetLastAnswerButton();
+						powerUpController.LeafPowerExpired();
+						isQuestionAnswered = false;
 					}
 					else
                     {
-						if(powerUpController.leafImmunity)
-                        {
-							// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
-							StartCoroutine(powerUpController.PowerUpFolhaAnim());
-							questionClock.NewCountdown(GameMechanicsConstant.TimeToAnswerQuestion);
-							eventManager.LetAnswerQuestion();
-							eventManager.ResetLastAnswerButton();
-							powerUpController.LeafPowerExpired();
-							isQuestionAnswered = false;
-						}
-						else
-                        {
-							AnswerButtonClicked(false, -1);
-						}
+						AnswerButtonClicked(false, -1);
 					}
 				}
 			}
@@ -449,7 +442,8 @@ public class GameController : MonoBehaviour
 
 			// New Countdown
 			questionClock.NewCountdown(GameMechanicsConstant.TimeToAnswerQuestion);
-			// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
+
+			// FOR FUTURE FEATURE: questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
 
 			// Allow all UI interactions.
 			blockerImage.transform.gameObject.SetActive(false);
