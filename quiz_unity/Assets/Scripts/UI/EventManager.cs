@@ -90,21 +90,25 @@ public class EventManager : MonoBehaviour
         }
     }
 
+    // Flag to allow the user to answer question
     public void LetAnswerQuestion()
     {
         idleState = true;
     }
 
+    // Flag for locking user's answer
     public void LockAnswer()
     {
         idleState = false;
     }
 
+    // Acces to touch status
     public bool TouchLastStatus()
     {
         return wasTouched;
     }
 
+    // Access to the status of the possibility of answer
     public bool AllowedToAnswer()
     {
         return idleState;

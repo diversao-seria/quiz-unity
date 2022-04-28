@@ -29,4 +29,5 @@ public static class GameMechanicsConstant
     public static readonly float LeafAnimationTimeinSeconds = 2.0f;
 
     public static readonly float TimeToAnswerQuestion = 45.0f;
+    public static readonly float TimeToAnswerQuestionAfterLeafPowerUp = 30.0f;
 }
