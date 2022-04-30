@@ -110,7 +110,8 @@ public class PreGameController : MonoBehaviour
             // Check if the request was sucessful
             if (www.result != UnityWebRequest.Result.Success)
             {
-                errorText = "Erro ao baixar o arquivo.\n" + www.error.ToString();
+                loadingScreenGame.DisableLoadingGUI();
+                errorController.GetComponent<PopupHandler>().InitialExitBehaviour("error");
                 //DisableLoadingUI();
             }
             else
@@ -125,6 +126,12 @@ public class PreGameController : MonoBehaviour
                     Debug.Log("path: " + path);
 
                     dataController.GetComponent<DataController>().WriteOnPath(path, www.downloadHandler.text);
+                }
+                else
+                {
+                    loadingScreenGame.DisableLoadingGUI();
+                    errorController.GetComponent<PopupHandler>().InitialExitBehaviour("error", "Código inválido");
+                    yield break;
                 }
             }
 
