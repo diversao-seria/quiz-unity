@@ -19,9 +19,16 @@ public static class GameMechanicsConstant
         BackgroundAndKill = 2
     }
 
+    public enum VisualSliderChange
+    {
+        Linear = 0,
+        Polynomial = 1,
+        Exponential = 2
+    }
+
     public static readonly int PowerUpCount = Enum.GetNames(typeof(PowerUpNames)).Length;
 
-    public static readonly float AnswerConfirmationTimeinSeconds = 2.0f;
+    public static readonly float AnswerConfirmationTimeinSeconds = 1.5f;
     public static readonly float FeedbackPowerUpAnimationTimeiNSeconds = 2.0f;
 
     public static readonly float IceAnimationTimeinSeconds = 1.5f;

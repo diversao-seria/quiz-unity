@@ -16,7 +16,7 @@ public class EventManager : MonoBehaviour
 
     private List<GameObject> answerButtonList;
 
-    public float answerConfirmation = GameMechanicsConstant.AnswerConfirmationTimeinSeconds;   
+    public float answerConfirmationTime = GameMechanicsConstant.AnswerConfirmationTimeinSeconds;   
 
     private AnswerButton selectedAnswerButton;
     private Slider progressSlider;
@@ -33,6 +33,8 @@ public class EventManager : MonoBehaviour
         holdTouchClock = new PressClock(0);
 
         audioSource = GetComponent<AudioSource>();
+
+        SliderFunctionValue.SetCalculationMode(GameMechanicsConstant.VisualSliderChange.Linear); // linear or polynomial or exponential
     }
 
     public void Update()
@@ -40,15 +42,20 @@ public class EventManager : MonoBehaviour
         if(wasTouched && !idleState)
         {
             Touch touch = Input.GetTouch(0);
+
+            // Update of the clock touching.
             holdTouchClock.IncreaseTime(Time.deltaTime);
 
             if(!audioSource.isPlaying) audioSource.PlayOneShot(touchingClip);
 
-            progressSlider.value = Math.Min(holdTouchClock.Time / answerConfirmation, 1);
+            // Update selection change (Orange bar - visual only)
+            progressSlider.value = Math.Min((float) SliderFunctionValue.ProgressCalculation(holdTouchClock.Time), 1.0f);
 
-            if(holdTouchClock.Time >= answerConfirmation)
+            Debug.Log("BEFORE F(X) -> " + progressSlider.value);
+            if (holdTouchClock.Time >= answerConfirmationTime)
             {
-                
+                Debug.Log("Holdtouch Time -> " + holdTouchClock.Time);
+                Debug.Log("AFTER F(X) -> " + progressSlider.value);
                 resetSlider();
                 resetTouchClock();
                 selectedAnswerButton.GetComponent<AnswerButton>().HandleClick(QuestionClock);
@@ -64,6 +71,26 @@ public class EventManager : MonoBehaviour
             }
         }
     }
+
+    // SliderCalculation from Interface
+
+    public float ProgressCalculation(float totalTimeElapsed)
+    {
+        // (8/21) * (X^3 - X^2 + X)
+
+        return (
+            ((totalTimeElapsed) * (totalTimeElapsed) * (totalTimeElapsed)) -
+            ((totalTimeElapsed) * (totalTimeElapsed)) +
+             (totalTimeElapsed)
+            ) * (8.0f / 21.0f);
+            
+    }
+    public float UpdateSliderValue(float totalTimeElapsed)
+    {
+        return ProgressCalculation(totalTimeElapsed);
+    }
+
+
 
     // Called from AnswerButton object as pointdown event.
     public void buttonTouched(AnswerButton answerButton)
