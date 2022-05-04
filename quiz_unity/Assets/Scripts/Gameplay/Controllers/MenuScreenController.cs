@@ -9,7 +9,7 @@ using System.IO;
 
 public class MenuScreenController : MonoBehaviour
 {
-    public Button m_classic, m_survival, m_competition, m_config, m_credits;
+    public Button m_classic, m_survival, m_competition, m_config, m_credits, m_tutorial;
 
     public Image m_profile, m_exit;
 
@@ -36,7 +36,8 @@ public class MenuScreenController : MonoBehaviour
         m_competition.onClick.AddListener(CompetitionBehaviour);
         m_config.onClick.AddListener(ConfigurationBehaviour);
         m_credits.onClick.AddListener(CreditsBehaviour);
-
+        m_tutorial.onClick.AddListener(TutorialBehaviour);
+        PlayerPrefs.SetInt("FromTutorial", 0);
         Load();
         userController = GameObject.Find("UserController").GetComponent<UserController>();
         if (!userController.loggedIn && !userController.isGuest)
@@ -48,6 +49,13 @@ public class MenuScreenController : MonoBehaviour
     void Update()
     {
 
+    }
+
+    void TutorialBehaviour()
+    {
+        PlayerPrefs.SetInt("FromTutorial", 1);
+        StartCoroutine(TransitionAnimation("Tutorial"));
+        
     }
 
     void ClassicBehaviour()

@@ -17,12 +17,14 @@ public class TutorialController : MonoBehaviour
     delegate void TutorialMethod();
     List<TutorialMethod> tutorial = new List<TutorialMethod>();
 
+    private int backToMenu;
+
     // Start is called before the first frame update
     void Start()
     {
         currentState = 0;
 
-        //Coloca as funções na lista tutorial
+        //Coloca as funï¿½ï¿½es na lista tutorial
         tutorial.Add(B1);
         tutorial.Add(B2);
         tutorial.Add(B3);
@@ -41,7 +43,7 @@ public class TutorialController : MonoBehaviour
     }
 
 
-    //Vai para o próximo estado
+    //Vai para o prï¿½ximo estado
     public void NextState()
     {
         if (currentState < tutorial.Count - 1)
@@ -65,7 +67,7 @@ public class TutorialController : MonoBehaviour
     {
         //Estado 1 - Intro
 
-        //Desativa todos os balões e deixa apenas o 1
+        //Desativa todos os balï¿½es e deixa apenas o 1
         balloon1.SetActive(true);
         balloon2.SetActive(false);
         balloon3.SetActive(false);
@@ -73,7 +75,7 @@ public class TutorialController : MonoBehaviour
         balloon5.SetActive(false);
         balloon6.SetActive(false);
 
-        //Desabilita o botão de voltar
+        //Desabilita o botï¿½o de voltar
         previousButton.SetActive(false);
 
         //Desfaz o highlight do estado 2
@@ -89,29 +91,29 @@ public class TutorialController : MonoBehaviour
     {
         //Estado 2 - Timer 
         
-        //Desfaz as ativações do anterior e próximo estado
+        //Desfaz as ativaï¿½ï¿½es do anterior e prï¿½ximo estado
         balloon1.SetActive(false);
         balloon3.SetActive(false);
         questionNumber.SetParent(PanelSafeArea, true);
 
-        //Habilita o balão a ser utilizado, o botão de voltar e dá destaque ao timer
+        //Habilita o balï¿½o a ser utilizado, o botï¿½o de voltar e dï¿½ destaque ao timer
         balloon2.SetActive(true);
         previousButton.SetActive(true);
         timer.SetParent(PanelBlurr, true);
 
-        //Muda a sprite do balão 2
+        //Muda a sprite do balï¿½o 2
         balloon2.GetComponent<Image>().sprite = b1;
 
         //Altera o texto
         Text text = balloon2.GetComponentInChildren<Text>();
-        text.text = "O tempo restante para responder a questão aparece aqui.";
+        text.text = "O tempo restante para responder a questï¿½o aparece aqui.";
     }
 
     private void B3()
     {
-        //Estado 3 - Questões
+        //Estado 3 - Questï¿½es
 
-        //Desfaz o próximo estado e o anterior
+        //Desfaz o prï¿½ximo estado e o anterior
         timer.SetParent(PanelSafeArea, true);
         exit.SetParent(PanelSafeArea, true);
 
@@ -123,12 +125,12 @@ public class TutorialController : MonoBehaviour
 
         //Altera o texto
         Text text = balloon2.GetComponentInChildren<Text>();
-        text.text = "O número da questão e o total aparecem aqui.";
+        text.text = "O nï¿½mero da questï¿½o e o total aparecem aqui.";
     }
 
     private void B4()
     {
-        //Estado 4 - Saída
+        //Estado 4 - Saï¿½da
         questionNumber.SetParent(PanelSafeArea, true);
         question.SetParent(PanelSafeArea, true);
 
@@ -144,7 +146,7 @@ public class TutorialController : MonoBehaviour
 
     private void B5()
     {
-        //Estado 5 - Questão
+        //Estado 5 - Questï¿½o
         exit.SetParent(PanelSafeArea, true);
         answerButtonParent.SetParent(PanelSafeArea, true);
 
@@ -153,7 +155,7 @@ public class TutorialController : MonoBehaviour
         balloon2.SetActive(false);
         balloon5.SetActive(false);
 
-        //O balão 4 só contém um tipo de texto, que está no objeto
+        //O balï¿½o 4 sï¿½ contï¿½m um tipo de texto, que estï¿½ no objeto
         balloon4.SetActive(true);
     }
 
@@ -166,7 +168,7 @@ public class TutorialController : MonoBehaviour
         balloon3.SetActive(false);
         balloon4.SetActive(false);
 
-        //O balão 5 também só contem um texto
+        //O balï¿½o 5 tambï¿½m sï¿½ contem um texto
         balloon5.SetActive(true);
     }
 
@@ -178,7 +180,7 @@ public class TutorialController : MonoBehaviour
         balloon5.SetActive(false);
         balloon6.SetActive(false);
 
-        //O balão 3 só contém um texto e imagens
+        //O balï¿½o 3 sï¿½ contï¿½m um texto e imagens
         balloon3.SetActive(true);
     }
 
@@ -189,7 +191,7 @@ public class TutorialController : MonoBehaviour
 
         balloon6.SetActive(true);
 
-        //Muda a sprite e o texto do balão 6
+        //Muda a sprite e o texto do balï¿½o 6
         balloon6.transform.GetChild(1).GetComponent<Image>().sprite = wind;
         Text text = balloon6.GetComponentInChildren<Text>();
         text.text = "Elimina duas alternativas incorretas.";
@@ -200,10 +202,10 @@ public class TutorialController : MonoBehaviour
         //Estado 9 - Poderes Folha
         balloon6.SetActive(true);
 
-        //Muda a sprite e o texto do balão 6
+        //Muda a sprite e o texto do balï¿½o 6
         balloon6.transform.GetChild(1).GetComponent<Image>().sprite = leaf;
         Text text = balloon6.GetComponentInChildren<Text>();
-        text.text = "Responder novamente caso erre. Lembre-se: este poder deve ser ativado antes de responder a questão.";
+        text.text = "Responder novamente caso erre. Lembre-se: este poder deve ser ativado antes de responder a questï¿½o.";
     }
 
     private void B10()
@@ -215,10 +217,10 @@ public class TutorialController : MonoBehaviour
 
         skipButton.transform.GetChild(0).GetComponent<Text>().text = "Pular Tutorial";
 
-        //Muda a sprite e o texto do balão 6
+        //Muda a sprite e o texto do balï¿½o 6
         balloon6.transform.GetChild(1).GetComponent<Image>().sprite = ice;
         Text text = balloon6.GetComponentInChildren<Text>();
-        text.text = "Após usar esse poder, o tempo da questão irá congelar por 7 segundos.";
+        text.text = "Apï¿½s usar esse poder, o tempo da questï¿½o irï¿½ congelar por 7 segundos.";
     }
 
     private void B11()
@@ -231,7 +233,7 @@ public class TutorialController : MonoBehaviour
         skipButton.transform.GetChild(0).GetComponent<Text>().text = "Pular Tutorial";
 
         Text text = balloon1.GetComponentInChildren<Text>();
-        text.text = "Se você fizer uma sequência correta de três acertos, os poderes usados serão restaurados.";
+        text.text = "Se vocï¿½ fizer uma sequï¿½ncia correta de trï¿½s acertos, os poderes usados serï¿½o restaurados.";
     }
 
     private void B12()
@@ -239,17 +241,25 @@ public class TutorialController : MonoBehaviour
         //Estado 12 - Final
         balloon6.SetActive(false);
         nextButton.SetActive(false);
-        skipButton.transform.GetChild(0).GetComponent<Text>().text = "Começar";
+        skipButton.transform.GetChild(0).GetComponent<Text>().text = "Comeï¿½ar";
 
         balloon1.SetActive(true);
 
         Text text = balloon1.GetComponentInChildren<Text>();
-        text.text = "Está preparado? Prossiga nessa aventura do conhecimento. Bom jogo!";
+        text.text = "Estï¿½ preparado? Prossiga nessa aventura do conhecimento. Bom jogo!";
     }
 
     public void StartGame()
     {
+        backToMenu = PlayerPrefs.GetInt("FromTutorial");
+         
+        if (backToMenu == 1) 
+        {
+            PlayerPrefs.SetInt("FromTutorial", 0);
+            SceneManager.LoadScene("MenuScreen");
+        } else 
         SceneManager.LoadScene("Game");
+        
     }
 
 }
