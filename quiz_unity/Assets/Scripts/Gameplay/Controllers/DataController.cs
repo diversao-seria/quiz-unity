@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System;
 using UnityEngine.Networking;
 using System.Text;
+using UnityEngine.UI;
 
 public class DataController : MonoBehaviour
 {
@@ -27,6 +28,7 @@ public class DataController : MonoBehaviour
 
 	private string currentQuizPlayerDataPath = null;
 
+	private Button exitButton;
 
 	public StreamWriter activeQuizDataWriter = null;
 
@@ -316,6 +318,19 @@ public class DataController : MonoBehaviour
 		int newTimeInSeconds = newTimeStamp.Hours * 60 * 60 + newTimeStamp.Minutes * 60 + newTimeStamp.Seconds;
 
 		return newTimeInSeconds - oldTimeInSeconds;
+	}
+	void Update()
+	{
+		CheckEscape();
+	}
+
+	void CheckEscape()
+	{
+		if (Input.GetKeyDown(KeyCode.Escape))
+		{
+			exitButton = GameObject.Find("ExitIcon").GetComponent<Button>();
+			exitButton.onClick.Invoke();
+		}
 	}
 }
 
