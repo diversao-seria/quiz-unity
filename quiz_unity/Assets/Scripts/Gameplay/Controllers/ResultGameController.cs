@@ -14,6 +14,8 @@ public class ResultGameController : MonoBehaviour
     private ResultPool resultPool;
     public bool dataFormisDone;
 
+    private HistoryController historyController = new HistoryController();
+
     // Result Screen
     public GameObject m_prefab_container;
     public GameObject lowerWrapper;
@@ -52,6 +54,9 @@ public class ResultGameController : MonoBehaviour
     {
         ShowPlayerAnswers();
         //SendPlayerData(dataController.QuizCode);
+
+        // Update history with new entry
+        ResultUpdateHistory();
     }
 
     // Update is called once per frame
@@ -64,7 +69,7 @@ public class ResultGameController : MonoBehaviour
     {
         GameObject questionsResultText = upperWrapper.transform.Find("QuestionsResultText").gameObject;
         questionsResultText.GetComponent<Text>().text = questionAnswer.NumberOfCorrects.ToString() + "/" + questionAnswer.Answer.Length;
-
+        
         string resultText = ResultEstimator.getResultEstimate(questionAnswer);
         GameObject calculatedResultText = upperWrapper.transform.Find("CalculatedResultText").gameObject;
         calculatedResultText.GetComponent<Text>().text = resultText;
@@ -168,5 +173,15 @@ public class ResultGameController : MonoBehaviour
         {
             ToggleObject(child,flag);
         }
+    }
+
+    public void ResultUpdateHistory(){
+        // Update history with new entry
+        HistoryController.HistoryEntry historyEntry = new HistoryController.HistoryEntry();
+        historyEntry.name = dataController.QuizCode;
+        historyEntry.score = questionAnswer.NumberOfCorrects.ToString() + "/" + questionAnswer.Answer.Length.ToString();
+        System.DateTime dateTime = System.DateTime.Now;
+        historyEntry.time = dateTime.ToString("dd/MM/yyyy HH:mm:ss");
+        historyController.UpdateHistory(historyEntry);
     }
 }
