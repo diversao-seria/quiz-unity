@@ -45,7 +45,7 @@ public class AnswerButton : MonoBehaviour
 		{
 			// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
 			StartCoroutine(powerUpController.PowerUpFolhaAnim());
-			questionClock.NewCountdown(30);
+			questionClock.NewCountdown(GameMechanicsConstant.TimeToAnswerQuestionAfterLeafPowerUp);
 			eventManager.LetAnswerQuestion();
 			eventManager.ResetLastAnswerButton();
 			powerUpController.LeafPowerExpired();

@@ -403,8 +403,11 @@ public class GameController : MonoBehaviour
 				Debug.Log("Form upload complete!");
 			}
 
-			www.downloadHandler.Dispose();
-			www.uploadHandler.Dispose();
+			// www.downloadHandler.Dispose();
+			www.disposeCertificateHandlerOnDispose = true;
+			www.disposeDownloadHandlerOnDispose = true;
+			www.disposeUploadHandlerOnDispose = true;
+			// www.uploadHandler.Dispose();
 			www.Dispose();
 		}
 		Debug.Log("Depois Form");
