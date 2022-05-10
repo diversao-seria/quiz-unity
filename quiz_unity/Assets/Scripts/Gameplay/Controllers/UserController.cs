@@ -14,6 +14,8 @@ public class UserController : MonoBehaviour
     [HideInInspector] public string auth_token;
     [HideInInspector] public string player_id;
 
+    [HideInInspector] public string history;
+
     void Awake()
     {
         DontDestroyOnLoad(gameObject);
@@ -49,6 +51,10 @@ public class UserController : MonoBehaviour
             player_id = PlayerPrefs.GetString("player_id");
         }
 
+        if (PlayerPrefs.HasKey("history"))
+        {
+            history = PlayerPrefs.GetString("history");
+        }
 
     }
 }
