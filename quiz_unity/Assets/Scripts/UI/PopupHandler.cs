@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,7 +22,7 @@ public class PopupHandler : MonoBehaviour
         Application.Quit();
     }
 
-    public void InitialExitBehaviour(string type)
+    public void InitialExitBehaviour(string type, string message = "Erro ao acessar o quiz")
     {
         Button[] buttons = FindObjectOfType<Canvas>().gameObject.GetComponentsInChildren<Button>();
 
@@ -38,8 +38,9 @@ public class PopupHandler : MonoBehaviour
         }
         else
         {
-            ToggleObjectsFromParent(m_errorPopup.transform, true);
-           // m_errorPopup.GetComponent<Text>().text = message;
+            GameObject newError = Instantiate(m_errorPopup, new Vector3(0, 0, 0), transform.rotation) as GameObject;
+            newError.transform.SetParent(GameObject.Find("PanelSafeArea").transform, false);
+            newError.transform.GetChild(0).gameObject.GetComponent<Text>().text = message;
 
         }
 
@@ -57,12 +58,15 @@ public class PopupHandler : MonoBehaviour
         }
 
         if (type == "exit")
-        {
+        {   
             ToggleObjectsFromParent(m_exitPopup.transform, true);
+            
         }
         else
         {
-            ToggleObjectsFromParent(m_errorPopup.transform, true);
+            GameObject newError = Instantiate(m_errorPopup, transform.position, transform.rotation) as GameObject;             
+            newError.transform.SetParent(GameObject.Find("PanelSafeArea").transform, false);
+            // ToggleObjectsFromParent(m_errorPopup.transform, true);
             // m_errorPopup.GetComponent<Text>().text = message;
 
         }
@@ -151,5 +155,17 @@ public class PopupHandler : MonoBehaviour
         {
             ToggleObjectsFromParent(m_errorPopup.transform, false);
         }
+    }
+
+    public void DestroyPopUp(GameObject obj){
+        Button[] buttons = FindObjectOfType<Canvas>().gameObject.GetComponentsInChildren<Button>();
+
+        // Make anything child of canvas interactable.
+        foreach (Button button in buttons)
+        {
+            button.enabled = true;
+        }
+
+        Destroy(obj);
     }
 }
