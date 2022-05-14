@@ -106,7 +106,7 @@ public class TutorialController : MonoBehaviour
 
         //Altera o texto
         Text text = balloon2.GetComponentInChildren<Text>();
-        text.text = "O tempo restante para responder a quest�o aparece aqui.";
+        text.text = "O tempo restante para responder a questão aparece aqui.";
     }
 
     private void B3()
@@ -125,7 +125,7 @@ public class TutorialController : MonoBehaviour
 
         //Altera o texto
         Text text = balloon2.GetComponentInChildren<Text>();
-        text.text = "O n�mero da quest�o e o total aparecem aqui.";
+        text.text = "O número da questão e o total aparecem aqui.";
     }
 
     private void B4()
@@ -205,7 +205,7 @@ public class TutorialController : MonoBehaviour
         //Muda a sprite e o texto do bal�o 6
         balloon6.transform.GetChild(1).GetComponent<Image>().sprite = leaf;
         Text text = balloon6.GetComponentInChildren<Text>();
-        text.text = "Responder novamente caso erre. Lembre-se: este poder deve ser ativado antes de responder a quest�o.";
+        text.text = "Responder novamente caso erre. Lembre-se: este poder deve ser ativado antes de responder a questão.";
     }
 
     private void B10()
@@ -220,7 +220,7 @@ public class TutorialController : MonoBehaviour
         //Muda a sprite e o texto do bal�o 6
         balloon6.transform.GetChild(1).GetComponent<Image>().sprite = ice;
         Text text = balloon6.GetComponentInChildren<Text>();
-        text.text = "Ap�s usar esse poder, o tempo da quest�o ir� congelar por 7 segundos.";
+        text.text = "Após usar esse poder, o tempo da questão irá congelar por 7 segundos.";
     }
 
     private void B11()
@@ -233,7 +233,7 @@ public class TutorialController : MonoBehaviour
         skipButton.transform.GetChild(0).GetComponent<Text>().text = "Pular Tutorial";
 
         Text text = balloon1.GetComponentInChildren<Text>();
-        text.text = "Se voc� fizer uma sequ�ncia correta de tr�s acertos, os poderes usados ser�o restaurados.";
+        text.text = "Se você fizer uma sequência correta de três acertos, os poderes usados serão restaurados.";
     }
 
     private void B12()
@@ -241,12 +241,12 @@ public class TutorialController : MonoBehaviour
         //Estado 12 - Final
         balloon6.SetActive(false);
         nextButton.SetActive(false);
-        skipButton.transform.GetChild(0).GetComponent<Text>().text = "Come�ar";
+        skipButton.transform.GetChild(0).GetComponent<Text>().text = "Começar";
 
         balloon1.SetActive(true);
 
         Text text = balloon1.GetComponentInChildren<Text>();
-        text.text = "Est� preparado? Prossiga nessa aventura do conhecimento. Bom jogo!";
+        text.text = "Está preparado? Prossiga nessa aventura do conhecimento. Bom jogo!";
     }
 
     public void StartGame()
