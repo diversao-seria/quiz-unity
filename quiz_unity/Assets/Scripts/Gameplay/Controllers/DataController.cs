@@ -43,15 +43,17 @@ public class DataController : MonoBehaviour
 
 	void Start()
 	{
-		DontDestroyOnLoad(gameObject);
-		_dataSessionKey = generateSessionKey();
-		interruptSubController = GetComponent<InterruptSubController>();
-		LoadGameData();
-		LoadPlayerProgress();
-		CreateInterruptionFolder();
+		if(GameObject.Find("testBOT") == null)
+        {
+			DontDestroyOnLoad(gameObject);
+			_dataSessionKey = generateSessionKey();
+			interruptSubController = GetComponent<InterruptSubController>();
+			LoadGameData();
+			LoadPlayerProgress();
+			CreateInterruptionFolder();
 
-		SceneManager.LoadScene("MenuScreen");
-
+			SceneManager.LoadScene("MenuScreen");
+		}
 	}
 
 	private void CreateInterruptionFolder()

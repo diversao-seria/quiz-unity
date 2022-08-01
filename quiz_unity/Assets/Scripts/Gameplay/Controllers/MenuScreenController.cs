@@ -40,10 +40,13 @@ public class MenuScreenController : MonoBehaviour
         PlayerPrefs.SetInt("FromTutorial", 0);
         Load();
         userController = GameObject.Find("UserController").GetComponent<UserController>();
+
+        /*
         if (!userController.loggedIn && !userController.isGuest)
         {
             SceneManager.LoadSceneAsync("Login", LoadSceneMode.Additive);
         }
+        */
     }
 
     void Update()
