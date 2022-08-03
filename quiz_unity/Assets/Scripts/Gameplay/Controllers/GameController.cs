@@ -370,6 +370,7 @@ public class GameController : MonoBehaviour
 
 			www.timeout = 10;
 
+
 			loadingScreenGame.EnableLoadingGUI();
 
 			// Form Data

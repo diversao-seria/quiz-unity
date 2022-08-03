@@ -19,10 +19,7 @@ public class UserController : MonoBehaviour
     void Awake()
     {
         DontDestroyOnLoad(gameObject);
-        if(GameObject.Find("testBOT") == null)
-        {
-            Instance = this;
-        }
+        Instance = this;
     }
 
 

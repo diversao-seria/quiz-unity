@@ -17,6 +17,11 @@ public class TesteModeMenu : EditorWindow
     GameObject testBOTprefab;
     GameObject testBOT;
 
+    string sceneFolderPath = "Assets" + Path.AltDirectorySeparatorChar + "Resources" + Path.AltDirectorySeparatorChar;
+
+    Scene firstTestScene;
+    string firstTestScene_name = "CenaTesteInicial";
+
     [MenuItem("Window/TesteModeMenu")]
     public static void ShowWindow()
     {
@@ -37,20 +42,32 @@ public class TesteModeMenu : EditorWindow
         {
             if(!testMode)
             {
+                // Test mode is on
                 testMode = true;
 
-                Scene entryPointScene = EditorSceneManager.GetSceneByBuildIndex(0);
-                EditorSceneManager.SetActiveScene(entryPointScene);
-                testBOTprefab = Resources.Load<GameObject>("TestBOT");
+                // Scene Creation
+                firstTestScene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects);
+                firstTestScene.name = firstTestScene_name;
+                
+                // Set as active scene and put stuff...
+                EditorSceneManager.SetActiveScene(firstTestScene);
+                testBOTprefab = Resources.Load<GameObject>("TestBOT"); // Load prehab
                 testBOT = Instantiate(testBOTprefab);
                 testBOT.name = "testBOT";
+
+                // Save it.
+                EditorSceneManager.SaveScene(firstTestScene, sceneFolderPath + firstTestScene_name + ".unity");
+
             }
             else
             {
-                Scene entryPointScene = EditorSceneManager.GetSceneByBuildIndex(0);
-                EditorSceneManager.SetActiveScene(entryPointScene);
-                DestroyImmediate(testBOT);
                 testMode = false;
+
+                EditorSceneManager.OpenScene("Assets" + Path.AltDirectorySeparatorChar + "Scenes" + Path.AltDirectorySeparatorChar + "Persistent" + ".unity");
+                EditorSceneManager.CloseScene(firstTestScene, true);
+
+                // DO NOT CHANGE THIS.
+                AssetDatabase.DeleteAsset(sceneFolderPath + firstTestScene_name + ".unity");
             }
         }
 
