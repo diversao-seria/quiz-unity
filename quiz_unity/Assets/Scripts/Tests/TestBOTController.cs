@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.IO;
 using System.Text;
+using System.Linq;
+using System.ComponentModel;
 
 public class TestBOTController : MonoBehaviour
 {
@@ -11,14 +13,32 @@ public class TestBOTController : MonoBehaviour
     public LoadingScreenGame loadingScreenGame;
     private DataController dataController;
     private UnityWebRequest www;
+    private string serverURL = "http://ds-quiz.herokuapp.com/matches";
 
     public string errorText = "Erro ao baixar o arquivo!";
+
+    
 
     // Start is called before the first frame update
     void Start()
     {
         Debug.Log("OLA! ME chamo " + this.name + " e fui inicializado com sucesso!");
-        StartCoroutine(GetFile("YZUG"));
+        // StartCoroutine(GetFile("YZUG"));
+        // StartCoroutine(SendForm("YZUG"));
+        string [] fileEntries = Directory.GetFiles(Path.Combine(Application.persistentDataPath + Path.AltDirectorySeparatorChar +
+				DataManagementConstant.PlayerDataPath + "Teste" + Path.AltDirectorySeparatorChar));
+
+        StartCoroutine(SendForm("Teste", fileEntries));
+        // foreach(string fileName in fileEntries)
+        // {
+        //     // string [] parts = fileName.Split(); 
+        //     string lastName = fileName.Split('/').Last();
+            
+        //     StartCoroutine(SendForm("Teste", lastName.Split('.')[0]));
+        //     Debug.Log(lastName + " enviado.");
+        // }
+
+            // ProcessFile(fileName);
 
     }
 
@@ -38,11 +58,12 @@ public class TestBOTController : MonoBehaviour
             // loadingScreenGame.EnableLoadingGUI();
 
             //yield return www.SendWebRequest();
-            
+
             www.SendWebRequest();
 
             while(!www.isDone)
             {
+                // Debug.Log(www.downloadProgress);
                 // DOwnload PRogess
                 // loadingScreenGame.UpdateDownloadProgress(www.downloadProgress * 100 + "%");
                 //textProgressObject
@@ -166,4 +187,86 @@ public class TestBOTController : MonoBehaviour
 		}
 	}
 
+    IEnumerator SendForm(string quizCode, string[] files)
+    {
+        foreach(string file in files)
+        {
+            string lastName = file.Split('/').Last();
+            string fileName = lastName.Split('.')[0];
+            Debug.Log("Antes FOrm");
+
+            using (UnityWebRequest www = UnityWebRequest.Post(serverURL, "POST"))
+            {
+
+
+                // List<IMultipartFormSection> formData = new List<IMultipartFormSection>();
+                // formData.Add(new MultipartFormDataSection("ID=" + exampleID.ToString() + "&" + "TemponoQuiz=" + exampleTime + "&" + "RespostasCorretas=" + exampleCorrect.ToString()));
+                // formData.Add(new MultipartFormFileSection("my file data", pathToMatchData));
+
+                string pathToQuizResult = Path.Combine(Application.persistentDataPath + Path.AltDirectorySeparatorChar +
+                    DataManagementConstant.PlayerDataPath + quizCode + Path.AltDirectorySeparatorChar + fileName + ".json");
+
+                string jsonData = null;
+
+                // loadingScreenGame = new LoadingScreenGame(spinner, fadeMask, textProgressObject);
+
+                try
+                {
+                    jsonData = System.IO.File.ReadAllText(pathToQuizResult);
+                }
+                catch (IOException e)
+                {
+                    Debug.Log(e);
+                }
+
+                www.timeout = 10;
+
+
+                // loadingScreenGame.EnableLoadingGUI();
+
+                // Form Data
+                byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
+                www.SetRequestHeader("Content-Type", "application/json");
+                www.uploadHandler = (UploadHandler) new UploadHandlerRaw(bodyRaw);
+                www.SendWebRequest();
+
+                while (!www.isDone)
+                {
+                    // loadingScreenGame.UpdateDownloadProgress(www.downloadProgress * 100 + "%");
+                    yield return null;
+                }
+
+                Debug.Log("Status Code: " + www.responseCode);
+                // loadingScreenGame.DisableLoadingGUI();
+
+                if (www.result != UnityWebRequest.Result.Success)
+                {
+                    // Sem internet -> 0
+
+
+                    Debug.Log(www.error);
+                    Debug.Log(www.downloadHandler.text);
+                    // TO DO - JANELA.
+
+                }
+                else
+                {
+                    // loadingScreenGame.UpdateDownloadProgress("100%");
+                    Debug.Log("Form upload complete!");
+                }
+
+                // www.downloadHandler.Dispose();
+                www.disposeCertificateHandlerOnDispose = true;
+                www.disposeDownloadHandlerOnDispose = true;
+                www.disposeUploadHandlerOnDispose = true;
+                // www.uploadHandler.Dispose();
+                www.Dispose();
+                // Debug.Log("Rodou");
+            }
+            Debug.Log("Depois Form");
+            // SceneManager.LoadScene("QuizResult");
+            yield return new WaitForSeconds(5);
+            Debug.Log("Rodando o próximo...");
+        }
+    }
 }
