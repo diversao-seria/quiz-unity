@@ -66,6 +66,10 @@ public class GameController : MonoBehaviour
 	DateTime beforeInterruptionTimeStamp;
 	DateTime backToForeground;
 
+	// Variaveis para o popup de erro ao enviar o formulário
+	public GameObject errorPopup;
+	public GameObject certezaPopup;
+
 	enum Clip : int
     {
 		correct,
@@ -324,7 +328,10 @@ public class GameController : MonoBehaviour
 		// SEnd data
 		// success or failure
 
+		PlayerPrefs.SetString("dataControllerQuizCode", dataController.QuizCode);
 		StartCoroutine(SendForm(dataController.QuizCode));
+
+		// AQUI !!!
 
 		// TO DO: success or failure
 		Debug.Log("isRoundactive: " + isRoundActive + " e isQuestionAnswered: " + isQuestionAnswered);
@@ -395,6 +402,12 @@ public class GameController : MonoBehaviour
 				Debug.Log(www.error);
 				Debug.Log(www.downloadHandler.text);
 				// TO DO - JANELA.
+				// AQUI !!!
+
+				// Show gameobject "ErrorPopup"
+				GameObject errorPopup = GameObject.Find("ErrorPopup");
+				errorPopup.SetActive(true);
+
 
 			}
 			else
@@ -507,6 +520,37 @@ public class GameController : MonoBehaviour
 
 			// Register Interruption Type
 			interruptSubController.RegisterInterrupt(GameMechanicsConstant.InterruptTypes.BackgroundToForegroud, false);
+		}
+	}
+
+	// Função que controla os popups relacionados com erro ao enviar o formulário ao final do Quiz.
+	public void RetryFormSubmission(int sel)
+	{	
+		switch (sel)
+		{
+			case 0:
+				// Enviar Novamente? Sim.
+				Debug.Log("Enviar Novamente? Sim.");
+				SendForm(PlayerPrefs.GetString("dataControllerQuizCode"));
+				errorPopup.SetActive(false);
+				break;
+			case 1:
+				// Enviar Novamente? Não.
+				Debug.Log("Enviar Novamente? Não.");
+				certezaPopup.SetActive(true);
+				errorPopup.SetActive(false);
+				break;
+			case 2:
+				// As informações podem ser perdidas. Deseja Continuar? Sim.
+				Debug.Log("As informações podem ser perdidas. Deseja Continuar? Sim.");
+				certezaPopup.SetActive(false);
+				break;
+			case 3:
+				// As informações podem ser perdidas. Deseja Continuar? Não.
+				Debug.Log("As informações podem ser perdidas. Deseja Continuar? Não.");
+				certezaPopup.SetActive(false);
+				errorPopup.SetActive(true);
+				break;
 		}
 	}
 
