@@ -331,7 +331,6 @@ public class GameController : MonoBehaviour
 		PlayerPrefs.SetString("dataControllerQuizCode", dataController.QuizCode);
 		StartCoroutine(SendForm(dataController.QuizCode));
 
-		// AQUI !!!
 
 		// TO DO: success or failure
 		Debug.Log("isRoundactive: " + isRoundActive + " e isQuestionAnswered: " + isQuestionAnswered);
@@ -402,10 +401,8 @@ public class GameController : MonoBehaviour
 				Debug.Log(www.error);
 				Debug.Log(www.downloadHandler.text);
 				// TO DO - JANELA.
-				// AQUI !!!
 
 				// Show gameobject "ErrorPopup"
-				GameObject errorPopup = GameObject.Find("ErrorPopup");
 				errorPopup.SetActive(true);
 
 
