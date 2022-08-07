@@ -69,6 +69,8 @@ public class GameController : MonoBehaviour
 	// Variaveis para o popup de erro ao enviar o formulário
 	public GameObject errorPopup;
 	public GameObject certezaPopup;
+	public bool clicou = false;
+	public bool reenviar = false;
 
 	enum Clip : int
     {
@@ -395,17 +397,47 @@ public class GameController : MonoBehaviour
 
 			if (www.result != UnityWebRequest.Result.Success)
 			{
-				// Sem internet -> 0
+				Debug.Log("Entrou no if");
+				while(www.result != UnityWebRequest.Result.Success)
+				{
+					// Sem internet -> 0
 
+						
+					Debug.Log(www.error);
+					Debug.Log(www.downloadHandler.text);
+					// TO DO - JANELA.
 
-				Debug.Log(www.error);
-				Debug.Log(www.downloadHandler.text);
-				// TO DO - JANELA.
+					// Show gameobject "ErrorPopup"
+					errorPopup.SetActive(true);
 
-				// Show gameobject "ErrorPopup"
-				errorPopup.SetActive(true);
+					while(!clicou){
+						
+					}
+					
+					if(reenviar){
+						www.SetRequestHeader("Content-Type", "application/json");
+						www.uploadHandler = (UploadHandler) new UploadHandlerRaw(bodyRaw);
+						www.SendWebRequest();
 
+						while (!www.isDone)
+						{
+							loadingScreenGame.UpdateDownloadProgress(www.downloadProgress * 100 + "%");
+							yield return null;
+						}
 
+						Debug.Log("Status Code: " + www.responseCode);
+						loadingScreenGame.DisableLoadingGUI();
+
+						Debug.Log("Reenviou formulário");
+						reenviar = false;
+					}else{
+						clicou = false;
+						Debug.Log("Não reenviou formulário");
+						break;
+					}
+
+					clicou = false;
+				}
 			}
 			else
 			{
@@ -528,7 +560,9 @@ public class GameController : MonoBehaviour
 			case 0:
 				// Enviar Novamente? Sim.
 				Debug.Log("Enviar Novamente? Sim.");
-				SendForm(PlayerPrefs.GetString("dataControllerQuizCode"));
+				//SendForm(PlayerPrefs.GetString("dataControllerQuizCode"));
+				clicou = true;
+				reenviar = true;
 				errorPopup.SetActive(false);
 				break;
 			case 1:
@@ -540,6 +574,7 @@ public class GameController : MonoBehaviour
 			case 2:
 				// As informações podem ser perdidas. Deseja Continuar? Sim.
 				Debug.Log("As informações podem ser perdidas. Deseja Continuar? Sim.");
+				clicou = true;
 				certezaPopup.SetActive(false);
 				break;
 			case 3:
