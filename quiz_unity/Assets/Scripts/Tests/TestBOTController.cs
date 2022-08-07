@@ -17,36 +17,31 @@ public class TestBOTController : MonoBehaviour
 
     public string errorText = "Erro ao baixar o arquivo!";
 
-    
-
-    // Start is called before the first frame update
     void Start()
     {
         Debug.Log("OLA! ME chamo " + this.name + " e fui inicializado com sucesso!");
-        // StartCoroutine(GetFile("YZUG"));
-        // StartCoroutine(SendForm("YZUG"));
-        string [] fileEntries = Directory.GetFiles(Path.Combine(Application.persistentDataPath + Path.AltDirectorySeparatorChar +
-				DataManagementConstant.PlayerDataPath + "Teste" + Path.AltDirectorySeparatorChar));
 
-        StartCoroutine(SendForm("Teste", fileEntries));
-        // foreach(string fileName in fileEntries)
-        // {
-        //     // string [] parts = fileName.Split(); 
-        //     string lastName = fileName.Split('/').Last();
-            
-        //     StartCoroutine(SendForm("Teste", lastName.Split('.')[0]));
-        //     Debug.Log(lastName + " enviado.");
-        // }
+        if (!Directory.Exists(Path.Combine(Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerDataPath + "Teste" + Path.AltDirectorySeparatorChar)))
+        {
+            Directory.CreateDirectory(Path.Combine(Application.persistentDataPath + Path.AltDirectorySeparatorChar + DataManagementConstant.PlayerDataPath + "Teste" + Path.AltDirectorySeparatorChar));
+        }
 
-            // ProcessFile(fileName);
+        // Scan for quiz answer files
+        string[] fileEntries = Directory.GetFiles(Path.Combine(Application.persistentDataPath + Path.AltDirectorySeparatorChar +
+                DataManagementConstant.PlayerDataPath + "Teste" + Path.AltDirectorySeparatorChar));
 
+        StartCoroutine(runTests("YZUG", "Teste", fileEntries));
     }
 
-    // Update is called once per frame
-    void Update()
+
+    IEnumerator runTests(string code, string folderName, string[] fileEntries)
     {
-        
+        yield return(StartCoroutine(GetFile(code)));
+        yield return new WaitForSeconds(5);
+        yield return(StartCoroutine(SendForm(folderName, fileEntries)));
+        Debug.Log("Testes concluídos.");
     }
+
 
     IEnumerator GetFile(string quizCode)
     {
@@ -55,35 +50,24 @@ public class TestBOTController : MonoBehaviour
         using (www = UnityWebRequest.Get(url))
         {
             www.timeout = 10;
-            // loadingScreenGame.EnableLoadingGUI();
-
-            //yield return www.SendWebRequest();
 
             www.SendWebRequest();
 
             while(!www.isDone)
             {
-                // Debug.Log(www.downloadProgress);
-                // DOwnload PRogess
-                // loadingScreenGame.UpdateDownloadProgress(www.downloadProgress * 100 + "%");
-                //textProgressObject
                 yield return null;
             }
 
             // Check if the request was sucessful
             if (www.result != UnityWebRequest.Result.Success)
             {
-                // loadingScreenGame.DisableLoadingGUI();
-                // errorController.GetComponent<PopupHandler>().InitialExitBehaviour("error");
                 Debug.Log(www.error);
-                //DisableLoadingUI();
             }
             else
             {
                 // If the quiz is valid, a json data will be returned.
                 if (!www.downloadHandler.text.Equals("null"))
                 {
-                    // loadingScreenGame.UpdateDownloadProgress("100%");
                     // Build path quiz directory
                     string path = Application.persistentDataPath + Path.AltDirectorySeparatorChar
                         + DataManagementConstant.QuizFolderRelativePath + quizCode + ".json";
@@ -93,28 +77,23 @@ public class TestBOTController : MonoBehaviour
                 }
                 else
                 {
-                    // loadingScreenGame.DisableLoadingGUI();
-                    // errorController.GetComponent<PopupHandler>().InitialExitBehaviour("error", "Código inválido");
                     Debug.Log("Código inválido");
                     yield break;
                 }
             }
 
-            // DisableLoadingUI();
-
             // Check if quiz's json is in correct place. 
             if (!www.downloadHandler.text.Equals("null") && isQuizAvailable(quizCode))
             {
-                // downloadProgess.text = "OK";
-                // LoadQuiz(quizCode);
+                Debug.Log("Quiz Baixado!");
             }
             else
             {
-                Debug.Log(errorText);
-                // loadingScreenGame.DisableLoadingGUI();
-                // errorController.GetComponent<PopupHandler>().InitialExitBehaviour("error");               
+                Debug.Log(errorText);          
             }
         }
+
+        Debug.Log("Teste de download concluído. Iniciando teste de upload...");
     }
 
     private bool isQuizAvailable(string quizCode)
@@ -152,7 +131,6 @@ public class TestBOTController : MonoBehaviour
 		{
 			// Exception when problems related to writting occurs (like disk is full)
 			Debug.Log(ioE.GetType().Name + "Erro ao escrever pastas/arquivos. Tentar de novo ou armazenamento está cheio.");
-			// TO DO:  Feedback Visual.
 		}
 	}
 
@@ -183,32 +161,23 @@ public class TestBOTController : MonoBehaviour
 		{
 			// Exception when problems related to writting occurs (like disk is full)
 			Debug.Log(ioE.GetType().Name + "Erro ao escrever pastas/arquivos. Tentar de novo ou armazenamento está cheio.");
-			// TO DO:  Feedback Visual.
 		}
 	}
 
     IEnumerator SendForm(string quizCode, string[] files)
     {
+        // for each file in 
         foreach(string file in files)
         {
             string lastName = file.Split('/').Last();
             string fileName = lastName.Split('.')[0];
-            Debug.Log("Antes FOrm");
 
             using (UnityWebRequest www = UnityWebRequest.Post(serverURL, "POST"))
             {
-
-
-                // List<IMultipartFormSection> formData = new List<IMultipartFormSection>();
-                // formData.Add(new MultipartFormDataSection("ID=" + exampleID.ToString() + "&" + "TemponoQuiz=" + exampleTime + "&" + "RespostasCorretas=" + exampleCorrect.ToString()));
-                // formData.Add(new MultipartFormFileSection("my file data", pathToMatchData));
-
                 string pathToQuizResult = Path.Combine(Application.persistentDataPath + Path.AltDirectorySeparatorChar +
                     DataManagementConstant.PlayerDataPath + quizCode + Path.AltDirectorySeparatorChar + fileName + ".json");
 
                 string jsonData = null;
-
-                // loadingScreenGame = new LoadingScreenGame(spinner, fadeMask, textProgressObject);
 
                 try
                 {
@@ -221,9 +190,6 @@ public class TestBOTController : MonoBehaviour
 
                 www.timeout = 10;
 
-
-                // loadingScreenGame.EnableLoadingGUI();
-
                 // Form Data
                 byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
                 www.SetRequestHeader("Content-Type", "application/json");
@@ -232,41 +198,29 @@ public class TestBOTController : MonoBehaviour
 
                 while (!www.isDone)
                 {
-                    // loadingScreenGame.UpdateDownloadProgress(www.downloadProgress * 100 + "%");
                     yield return null;
                 }
 
                 Debug.Log("Status Code: " + www.responseCode);
-                // loadingScreenGame.DisableLoadingGUI();
 
                 if (www.result != UnityWebRequest.Result.Success)
                 {
                     // Sem internet -> 0
-
-
                     Debug.Log(www.error);
-                    Debug.Log(www.downloadHandler.text);
-                    // TO DO - JANELA.
-
+                    Debug.Log("Erro ao enviar o arquivo " + fileName);
                 }
                 else
                 {
-                    // loadingScreenGame.UpdateDownloadProgress("100%");
-                    Debug.Log("Form upload complete!");
+                    Debug.Log(fileName + " enviado.");
                 }
 
-                // www.downloadHandler.Dispose();
                 www.disposeCertificateHandlerOnDispose = true;
                 www.disposeDownloadHandlerOnDispose = true;
                 www.disposeUploadHandlerOnDispose = true;
-                // www.uploadHandler.Dispose();
                 www.Dispose();
-                // Debug.Log("Rodou");
             }
-            Debug.Log("Depois Form");
-            // SceneManager.LoadScene("QuizResult");
+            
             yield return new WaitForSeconds(5);
-            Debug.Log("Rodando o próximo...");
         }
     }
 }
