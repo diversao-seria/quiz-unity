@@ -71,6 +71,7 @@ public class GameController : MonoBehaviour
 	public GameObject certezaPopup;
 	public bool clicou = false;
 	public bool reenviar = false;
+	public bool enviou = false;
 
 	enum Clip : int
     {
@@ -352,105 +353,85 @@ public class GameController : MonoBehaviour
 
 		Debug.Log("Antes FOrm");
 
-		using (UnityWebRequest www = UnityWebRequest.Post(serverURL, "POST"))
-		{
+		enviou = false;
+		while(!enviou){
 
-
-			// List<IMultipartFormSection> formData = new List<IMultipartFormSection>();
-			// formData.Add(new MultipartFormDataSection("ID=" + exampleID.ToString() + "&" + "TemponoQuiz=" + exampleTime + "&" + "RespostasCorretas=" + exampleCorrect.ToString()));
-			// formData.Add(new MultipartFormFileSection("my file data", pathToMatchData));
-
-			string pathToQuizResult = Path.Combine(Application.persistentDataPath + Path.AltDirectorySeparatorChar +
-				DataManagementConstant.PlayerDataPath + quizCode + Path.AltDirectorySeparatorChar + "QuizAnswerData" + ".json");
-
-			string jsonData = null;
-
-			loadingScreenGame = new LoadingScreenGame(spinner, fadeMask, textProgressObject);
-
-			try
+			using (UnityWebRequest www = UnityWebRequest.Post(serverURL, "POST"))
 			{
-				jsonData = System.IO.File.ReadAllText(pathToQuizResult);
-			}
-			catch (IOException e)
-			{
-				Debug.Log(e);
-			}
 
-			www.timeout = 10;
+				// List<IMultipartFormSection> formData = new List<IMultipartFormSection>();
+				// formData.Add(new MultipartFormDataSection("ID=" + exampleID.ToString() + "&" + "TemponoQuiz=" + exampleTime + "&" + "RespostasCorretas=" + exampleCorrect.ToString()));
+				// formData.Add(new MultipartFormFileSection("my file data", pathToMatchData));
 
-			loadingScreenGame.EnableLoadingGUI();
+				string pathToQuizResult = Path.Combine(Application.persistentDataPath + Path.AltDirectorySeparatorChar +
+					DataManagementConstant.PlayerDataPath + quizCode + Path.AltDirectorySeparatorChar + "QuizAnswerData" + ".json");
 
-			// Form Data
-			byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
-			www.SetRequestHeader("Content-Type", "application/json");
-			www.uploadHandler = (UploadHandler) new UploadHandlerRaw(bodyRaw);
-			www.SendWebRequest();
+				string jsonData = null;
 
-			while (!www.isDone)
-			{
-				loadingScreenGame.UpdateDownloadProgress(www.downloadProgress * 100 + "%");
-				yield return null;
-			}
+				loadingScreenGame = new LoadingScreenGame(spinner, fadeMask, textProgressObject);
 
-			Debug.Log("Status Code: " + www.responseCode);
-			loadingScreenGame.DisableLoadingGUI();
-
-			if (www.result != UnityWebRequest.Result.Success)
-			{
-				Debug.Log("Entrou no if");
-				while(www.result != UnityWebRequest.Result.Success)
+				try
 				{
-					// Sem internet -> 0
+					jsonData = System.IO.File.ReadAllText(pathToQuizResult);
+				}
+				catch (IOException e)
+				{
+					Debug.Log(e);
+				}
 
-						
-					Debug.Log(www.error);
-					Debug.Log(www.downloadHandler.text);
-					// TO DO - JANELA.
+				www.timeout = 10;
 
-					// Show gameobject "ErrorPopup"
+				loadingScreenGame.EnableLoadingGUI();
+
+				// Form Data
+				byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
+				www.SetRequestHeader("Content-Type", "application/json");
+				www.uploadHandler = (UploadHandler) new UploadHandlerRaw(bodyRaw);
+				www.SendWebRequest();
+
+				while (!www.isDone)
+				{
+					if(www.result == UnityWebRequest.Result.ConnectionError){
+						Debug.Log("Connection Error");
+						break;
+					}
+					loadingScreenGame.UpdateDownloadProgress(www.downloadProgress * 100 + "%");
+					yield return null;
+				}
+				
+				Debug.Log("Status Code: " + www.responseCode);
+				loadingScreenGame.DisableLoadingGUI();
+
+				if (www.result != UnityWebRequest.Result.Success)
+				{
+					Debug.Log("Entrou no if");
+					
 					errorPopup.SetActive(true);
 
 					while(!clicou){
-						
+						yield return null;
 					}
+					clicou = false;
 					
 					if(reenviar){
-						www.SetRequestHeader("Content-Type", "application/json");
-						www.uploadHandler = (UploadHandler) new UploadHandlerRaw(bodyRaw);
-						www.SendWebRequest();
-
-						while (!www.isDone)
-						{
-							loadingScreenGame.UpdateDownloadProgress(www.downloadProgress * 100 + "%");
-							yield return null;
-						}
-
-						Debug.Log("Status Code: " + www.responseCode);
-						loadingScreenGame.DisableLoadingGUI();
-
-						Debug.Log("Reenviou formulário");
-						reenviar = false;
-					}else{
-						clicou = false;
-						Debug.Log("Não reenviou formulário");
-						break;
+						Debug.Log("Tentando Enviar Novamente");
 					}
-
-					clicou = false;
 				}
-			}
-			else
-			{
-				loadingScreenGame.UpdateDownloadProgress("100%");
-				Debug.Log("Form upload complete!");
+				else
+				{
+					loadingScreenGame.UpdateDownloadProgress("100%");
+					Debug.Log("Form upload complete!");
+					enviou = true;
+				}
+
+				// www.downloadHandler.Dispose();
+				www.disposeCertificateHandlerOnDispose = true;
+				www.disposeDownloadHandlerOnDispose = true;
+				www.disposeUploadHandlerOnDispose = true;
+				// www.uploadHandler.Dispose();
+				www.Dispose();
 			}
 
-			// www.downloadHandler.Dispose();
-			www.disposeCertificateHandlerOnDispose = true;
-			www.disposeDownloadHandlerOnDispose = true;
-			www.disposeUploadHandlerOnDispose = true;
-			// www.uploadHandler.Dispose();
-			www.Dispose();
 		}
 		Debug.Log("Depois Form");
 		SceneManager.LoadScene("QuizResult");
@@ -575,6 +556,7 @@ public class GameController : MonoBehaviour
 				// As informações podem ser perdidas. Deseja Continuar? Sim.
 				Debug.Log("As informações podem ser perdidas. Deseja Continuar? Sim.");
 				clicou = true;
+				enviou = true;
 				certezaPopup.SetActive(false);
 				break;
 			case 3:
