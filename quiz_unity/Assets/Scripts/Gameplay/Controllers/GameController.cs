@@ -354,7 +354,9 @@ public class GameController : MonoBehaviour
 		Debug.Log("Antes FOrm");
 
 		enviou = false;
-		while(!enviou){
+		//int count = 0;
+		while(!enviou /*|| count < 10*/){
+			//count++;
 
 			using (UnityWebRequest www = UnityWebRequest.Post(serverURL, "POST"))
 			{
